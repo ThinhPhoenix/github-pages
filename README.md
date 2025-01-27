@@ -40,7 +40,7 @@ Dán đoạn code sau vào `deploy.yml`:
 
 ```Đối với Vite```<img src="https://skillicons.dev/icons?i=vite&theme=dark" width="20" height="20">
 ```yaml
-name: 🐈‍⬛ Deploy
+name: 🐈‍⬛ Deploy (Vite)
 
 on:
   push:
@@ -93,7 +93,7 @@ jobs:
 
 ```Đối với Nextjs```<img src="https://skillicons.dev/icons?i=nextjs&theme=dark" width="20" height="20">
 ```yaml
-name: GitHub Pages deploy
+name: 🐈‍⬛ Deploy (Nextjs)
 
 on:
   workflow_dispatch:
@@ -105,22 +105,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
+      - name: 🛎️ Checkout repo
         uses: actions/checkout@v4.1.7
 
-      - name: Setup Node
+      - name: 📦 Cài Node.js
         uses: actions/setup-node@v4.0.2
 
-      - name: Installing packages
+      - name: 🛠️ Tải packages
         run: yarn install
 
-      - name: Extract repository name
+      - name: 🔍 Tìm tên repository
         run: echo "BASE_PATH=/$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2)" >> $GITHUB_ENV
 
-      - name: Build page
+      - name: 🏗️ Build dự án
         run: yarn run build && touch ./out/.nojekyll
 
-      - name: Deploy 🚀
+      - name: Deploy lên GitHub pages 🚀
         uses: JamesIves/github-pages-deploy-action@v4.6.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
