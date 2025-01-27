@@ -31,7 +31,7 @@ Tạo file `.github/workflows/deploy.yml` trong thư mục gốc của project.
 Dán đoạn code sau vào `deploy.yml`:  
 
 ```yaml
-name: Deploy Vite App to GitHub Pages
+name: 🐈‍⬛ Deploy
 
 on:
   push:
@@ -40,42 +40,42 @@ on:
 
 jobs:
   build:
-    name: Build Project 🔨
+    name: Build project 🔨
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Clone Repository
+      - name: 🛎️ Checkout repo
         uses: actions/checkout@v3
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Cài Node.js
         uses: actions/setup-node@v3
 
-      - name: 🛠️ Install Dependencies
+      - name: 🛠️ Tải dependencies
         uses: bahmutov/npm-install@v1
 
-      - name: 🏗️ Build Project
+      - name: 🏗️ Build dự án
         run: npm run build
 
-      - name: 📤 Upload Build Artifacts
+      - name: 📤 Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: production-files
           path: ./dist
 
   deploy:
-    name: 🚀 Deploy to GitHub Pages
+    name: 🚀 Deploy lên GitHub pages
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: 📥 Download Build Artifacts
+      - name: 📥 Tải build artifacts
         uses: actions/download-artifact@v3
         with:
           name: production-files
           path: ./dist
 
-      - name: 🌐 Deploy to gh-pages Branch
+      - name: 🌐 Deploy lên nhánh gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
