@@ -1,4 +1,4 @@
-[![My Skills](https://skillicons.dev/icons?i=github,githubactions,nodejs&theme=dark)](https://skillicons.dev)
+[![My Skills](https://skillicons.dev/icons?i=vite,github,githubactions,nodejs&theme=dark)](https://skillicons.dev)
 ### 🚀 Hướng Dẫn Triển Khai Web App Lên GitHub Pages  
 
 GitHub Pages chỉ hỗ trợ **static web** (HTML, CSS, JS), vì vậy bạn có thể deploy các dự án **React, Vue, Svelte...** miễn là đã **build ra file tĩnh**.  
