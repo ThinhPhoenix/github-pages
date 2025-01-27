@@ -1,9 +1,9 @@
 ### 📦 Deploy
 
-1. **[<kbd>Triển khai Vite</kbd>](https://github.com/ThinhPhoenix/deploy/blob/main/vite.md)**  
+1. **[<kbd><br>Triển khai Vite<br><br></kbd>](https://github.com/ThinhPhoenix/deploy/blob/main/vite.md)**  👈
    Hướng dẫn chi tiết để triển khai dự án Vite lên GitHub Pages.
 
-2. **[<kbd>Triển khai Next.js</kbd>](https://github.com/ThinhPhoenix/deploy/blob/main/nextjs.md)**  
+2. **[<kbd><br>Triển khai Next.js<br><br></kbd>](https://github.com/ThinhPhoenix/deploy/blob/main/nextjs.md)**  👈
    Hướng dẫn triển khai dự án Next.js lên GitHub Pages với hỗ trợ xuất tĩnh hoàn chỉnh.
 
 ---
