@@ -90,11 +90,7 @@ Sau khi commit và push lên GitHub, bạn cần thiết lập một số cài �
 1. **Vào repo trên GitHub** → **Settings** → **Actions** → **General**  
 2. **Tìm mục Workflow permissions** → Chọn **Read and Write** → **Save**  
 3. **Vào tab Actions**, nếu job bị failed, nhấn **Re-run failed jobs**  
-4. **Vào Settings** → **Pages** →  
-   - **Chọn "Deploy from branch"**  
-   - **Branch: `gh-pages`**  
-   - **Save**  
-
+4. **Vào Settings** → **Pages** → **Chọn "Deploy from branch"** → **Branch: `gh-pages`** → **Save**  
 ---
 
 ### 🌍 Bước 4: Truy Cập Website  
