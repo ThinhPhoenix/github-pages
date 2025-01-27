@@ -1,5 +1,5 @@
 <img src="https://github.com/user-attachments/assets/cedfcf13-3634-4134-be70-430cb0904ee6" width="10%"><br/>
-### 🚀 Hướng Dẫn Triển Khai Vite App Lên GitHub Pages  
+### 🚀 Hướng Dẫn Triển Khai Web App Lên GitHub Pages  
 
 GitHub Pages chỉ hỗ trợ **static web** (HTML, CSS, JS), vì vậy bạn có thể deploy các dự án **React, Vue, Svelte...** miễn là đã **build ra file tĩnh**.  
 
