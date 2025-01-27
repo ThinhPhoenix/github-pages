@@ -17,7 +17,7 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: process.env.BASE_PATH || "",
+  base: "/tên-repo/", // ⚡ Đổi "tên-repo" thành tên repo của bạn
 });
 ```
 
