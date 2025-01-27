@@ -7,7 +7,7 @@ Dưới đây là cách deploy một **Vite project** lên GitHub Pages bằng *
 
 ---
 
-### 🛠️ Bước 1: Cấu Hình `config`  
+### 🛠️ Bước 1: Cấu Hình `vite config`  
 Cập nhật **base URL** sao cho trùng với **tên repository** trên GitHub.  
 
 ```ts
