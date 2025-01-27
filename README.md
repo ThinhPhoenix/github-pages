@@ -99,7 +99,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - main # 🔄 Mỗi lần push lên main, workflow sẽ chạy
 
 jobs:
   build:
