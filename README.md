@@ -21,7 +21,7 @@ export default defineConfig({
 
 ```Đối với Nextjs```<img src="https://skillicons.dev/icons?i=nextjs&theme=dark" width="20" height="20">
 ```js
-// next.config.js
+// next.config.mjs
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
