@@ -63,7 +63,7 @@ jobs:
           path: ./dist
 
   deploy:
-    name: 🚀 Deploy lên GitHub pages
+    name: Deploy lên GitHub pages 🚀
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
