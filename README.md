@@ -67,7 +67,7 @@ jobs:
         run: npm run build
 
       - name: 📤 Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: production-files
           path: ./dist
@@ -80,7 +80,7 @@ jobs:
 
     steps:
       - name: 📥 Tải build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: production-files
           path: ./dist
