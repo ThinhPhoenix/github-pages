@@ -44,6 +44,7 @@ Dán đoạn code sau vào `deploy.yml`:
 name: 🐈‍⬛ Deploy (Vite)
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main # 🔄 Mỗi lần push lên main, workflow sẽ chạy
