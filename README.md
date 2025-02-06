@@ -126,7 +126,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.6.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages # The branch the action should deploy to.
+          branch: public # The branch the action should deploy to.
           folder: out # The folder the action should deploy to.
 ```
 
