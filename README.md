@@ -1,13 +1,9 @@
-### 🚀 Hướng Dẫn Triển Khai Web App Lên GitHub Pages  
+0. Init setup
 
-GitHub Pages chỉ hỗ trợ **static web** (HTML, CSS, JS), vì vậy bạn có thể deploy các dự án **React, Vue, Svelte...** miễn là đã **build ra file tĩnh**.  
+	- Repo > Settings > Actions > General > Workflow permissions > Read & Write
 
-Dưới đây là cách deploy một **Vite project** lên GitHub Pages bằng **GitHub Actions**.  
+1. Change base url into /repo-name/
 
----
-
-### 🛠️ Bước 1: Cấu Hình `Config`  
-```Đối với Vite```<img src="https://skillicons.dev/icons?i=vite&theme=dark" width="20" height="20">
 ```ts
 // vite.config.ts
 import { defineConfig } from "vite";
@@ -15,32 +11,18 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/tên-repo/", // ⚡ Đổi "tên-repo" thành tên repo của bạn
+  base: "/repo-name/", // ⚡ Change "repo-name" into your repo name
 });
 ```
 
-```Đối với Nextjs```<img src="https://skillicons.dev/icons?i=nextjs&theme=dark" width="20" height="20">
-```js
-// next.config.mjs
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  output: "export",
-  assetPrefix: "/tên-repo/", // ⚡ Đổi "tên-repo" thành tên repo của bạn
-};
-
-export default nextConfig;
+2. Upload environment variables into github secrets
+```bash
+gh secret set -f .env
 ```
----
+`GitHub CLI required`
 
-### ⚙️ Bước 2: Tạo GitHub Actions Workflow  
-Tạo file `.github/workflows/deploy.yml` trong thư mục gốc của project.  
-
-📌 **Nếu thư mục `.github` chưa tồn tại, hãy tự tạo mới.**  
-
-Dán đoạn code sau vào `deploy.yml`:  
-
-```Đối với Vite```<img src="https://skillicons.dev/icons?i=vite&theme=dark" width="20" height="20">
-```yaml
+3. Create .github/workflows/deploy.yml
+```yml
 name: Deploy🪽
 
 on:
@@ -54,148 +36,53 @@ on:
         required: false
 
 jobs:
-  build:
-    name: Build project 🔨
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Import secrets
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ inputs.secrets_txt }}" ]; then
-            echo "${{ inputs.secrets_txt }}" > secrets.txt
-          elif [ -f .env.example ]; then
-            cp .env.example secrets.txt
-          fi
-          
-          if [ -f secrets.txt ]; then
-            while IFS='=' read -r key value; do
-              if [[ -n "$key" && -n "$value" && ! "$key" =~ ^# ]]; then
-                echo "$key=$value" >> $GITHUB_ENV
-              fi
-            done < secrets.txt
-          fi
-
-      - name: Cài Node.js
-        uses: actions/setup-node@v3
-
-      - name: Tải dependencies
-        uses: bahmutov/npm-install@v1
-
-      - name: Build dự án
-        run: npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-files
-          path: ./dist
-
-  deploy:
-    name: Deploy lên GitHub pages 🚀
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Tải build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: production-files
-          path: ./dist
-
-      - name: Deploy lên nhánh gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-```
-
-```Đối với Nextjs```<img src="https://skillicons.dev/icons?i=nextjs&theme=dark" width="20" height="20">
-```yaml
-name: Deploy🪽
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      secrets_txt:
-        description: "Paste secrets here (format: KEY=VALUE)"
-        required: false
-
-jobs:
-  build:
+  build_and_deploy:
+    name: Build & Deploy 🚀
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4.1.7
 
       - name: Import secrets
+        env:
+          SECRETS_CONTEXT: ${{ toJSON(secrets) }}
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ inputs.secrets_txt }}" ]; then
-            echo "${{ inputs.secrets_txt }}" > secrets.txt
-          elif [ -f .env.example ]; then
-            cp .env.example secrets.txt
-          fi
-          
-          if [ -f secrets.txt ]; then
-            while IFS='=' read -r key value; do
-              if [[ -n "$key" && -n "$value" && ! "$key" =~ ^# ]]; then
-                echo "$key=$value" >> $GITHUB_ENV
+          # Get keys from .env.example
+          if [ -f .env.example ]; then
+            # Extract keys from .env.example, ignoring comments and empty lines
+            grep -v '^#' .env.example | grep -v '^$' | while IFS='=' read -r key value; do
+              # Trim whitespace from key
+              key=$(echo "$key" | xargs)
+              if [ -n "$key" ]; then
+                # Get secret value using jq
+                secret_value=$(echo "$SECRETS_CONTEXT" | jq -r ".[\"$key\"]")
+                if [ "$secret_value" != "null" ] && [ -n "$secret_value" ]; then
+                  echo "$key=$secret_value" >> $GITHUB_ENV
+                fi
               fi
-            done < secrets.txt
+            done
           fi
 
-      - name: Cài Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4.0.2
+        with:
+          cache: 'npm'
 
-      - name: Tải packages
-        run: yarn install
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Build dự án
-        run: yarn run build && touch ./out/.nojekyll
+      - name: Build project
+        run: npm run build && touch ./dist/.nojekyll  # ⚡ Adjust output folder if needed
 
-      - name: Deploy lên GitHub pages
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.6.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: public # The branch the action should deploy to.
-          folder: out # The folder the action should deploy to.
+          branch: public
+          folder: dist  # ⚡ Adjust to your build output folder (dist or out)
 ```
+`Create a .env.example and commit to repo or you can paste env via GitHub actions when dispatch workflow`
 
----
+4. Provided
+   - Repo > Settings > Pages > Branch (Select "public") > Save
 
-### ✅ Bước 3: Cấu Hình GitHub  
-Sau khi commit và push lên GitHub, bạn cần thiết lập một số cài đặt:  
-
-1. **Vào repo trên GitHub** → **Settings** → **Actions** → **General**  
-2. **Tìm mục Workflow permissions** → Chọn **Read and Write** → **Save**  
-3. **Vào tab Actions**, nếu job bị failed, nhấn **Re-run failed jobs**  
-4. **Vào Settings** → **Pages** → **Chọn "Deploy from branch"** → **Branch: `gh-pages`** → **Save**  
----
-
-### 🌍 Bước 4: Truy Cập Website  
-Sau khi quá trình deploy hoàn tất, website của bạn sẽ có đường dẫn:  
-
-```
-https://<username_github>.github.io/<tên-repo>/
-```
-
-📌 Nếu thấy lỗi **404**, hãy thử thêm `index.html` vào đường dẫn:  
-
-```
-https://<username_github>.github.io/<tên-repo>/index.html
-```
-
----
-
-### 🎯 Lưu Ý  
-- **Mỗi repository chỉ có thể deploy một trang web**  
-- Nếu dùng **Custom Domain**, hãy thêm file `CNAME` vào thư mục `public/`  
-- Nếu gặp lỗi **404 khi refresh trang**, cần thêm file `404.html` để hỗ trợ `SPA`  
-
-Chúc bạn deploy thành công! 🚀
