@@ -1,88 +1,112 @@
-0. Init setup
+# GitHub Actions Deployment Template
 
-	- Repo > Settings > Actions > General > Workflow permissions > Read & Write
+A streamlined template for deploying Vite, NextJS, NuxtJS, ... applications to GitHub Pages using GitHub Actions, with secure environment variable handling.
 
-1. Change base url into /repo-name/
+> Special thanks to [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) for making this deployment process possible.
 
-```ts
-// vite.config.ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+## 🚀 Quick Start
 
-export default defineConfig({
-  plugins: [react()],
-  base: "/repo-name/", // ⚡ Change "repo-name" into your repo name
-});
-```
+1. Enable GitHub Actions permissions:
+   ```
+   Repository > Settings > Actions > General > Workflow permissions > Read & Write
+   ```
 
-2. Upload environment variables into github secrets
+2. Update the base URL in `vite.config.ts`:
+   ```typescript
+   import { defineConfig } from "vite";
+   import react from "@vitejs/plugin-react";
+
+   export default defineConfig({
+     plugins: [react()],
+     base: "/your-repo-name/", // ⚡ Replace with your repository name
+   });
+   ```
+
+3. Create `.env.example` with your required environment variables:
+   ```
+   API_KEY=
+   DATABASE_URL=
+   ```
+
+4. Upload your environment variables to GitHub Secrets:
+   ```bash
+   gh secret set -f .env
+   ```
+   Note: GitHub CLI is required for this step.
+
+## 📦 Features
+
+- Automated deployment to GitHub Pages
+- Secure environment variable handling
+- Configurable build settings
+- No Jekyll processing (`.nojekyll` file included)
+
+## 🔧 Configuration
+
+### GitHub Pages Setup
+
+1. Go to `Repository > Settings > Pages`
+2. Select `public` branch as the source
+3. Save your changes
+
+### Workflow Configuration
+
+The deployment workflow is defined in `.github/workflows/deploy.yml` and includes:
+
+- Automatic deployment on pushes to main branch
+- Manual workflow dispatch with optional secret configuration
+- Node.js setup with npm caching
+- Environment variable injection from GitHub Secrets
+- Build and deployment steps
+
+## 💡 Environment Variables
+
+Environment variables can be managed in two ways:
+
+1. Through GitHub Secrets (recommended for production)
+2. Via workflow dispatch input (useful for testing)
+
+## 🏗️ Build Configuration
+
+The default build configuration uses:
+- Output directory: `dist`
+- Base URL: `/repository-name/`
+
+Adjust these settings in:
+- `vite.config.ts` for the base URL
+- `deploy.yml` for the build output folder
+
+## 📝 Usage
+
+### Automatic Deployment
+
+Push to the main branch to trigger automatic deployment:
 ```bash
-gh secret set -f .env
+git push origin main
 ```
-`GitHub CLI required`
 
-3. Create .github/workflows/deploy.yml
-```yml
-name: Deploy🪽
+### Manual Deployment
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      secrets_txt:
-        description: "Paste secrets here (format: KEY=VALUE)"
-        required: false
+1. Go to Actions tab in your repository
+2. Select "Deploy🪽" workflow
+3. Click "Run workflow"
+4. Optionally add secrets in KEY=VALUE format
 
-jobs:
-  build_and_deploy:
-    name: Build & Deploy 🚀
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4.1.7
+## ⚠️ Important Notes
 
-      - name: Import secrets
-        env:
-          SECRETS_CONTEXT: ${{ toJSON(secrets) }}
-        run: |
-          # Get keys from .env.example
-          if [ -f .env.example ]; then
-            # Extract keys from .env.example, ignoring comments and empty lines
-            grep -v '^#' .env.example | grep -v '^$' | while IFS='=' read -r key value; do
-              # Trim whitespace from key
-              key=$(echo "$key" | xargs)
-              if [ -n "$key" ]; then
-                # Get secret value using jq
-                secret_value=$(echo "$SECRETS_CONTEXT" | jq -r ".[\"$key\"]")
-                if [ "$secret_value" != "null" ] && [ -n "$secret_value" ]; then
-                  echo "$key=$secret_value" >> $GITHUB_ENV
-                fi
-              fi
-            done
-          fi
+- Ensure your repository name matches the base URL in `vite.config.ts`
+- Keep your `.env.example` file updated with required variable names
+- Never commit actual secret values to the repository
+- The public branch will be created automatically on first deployment
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.0.2
-        with:
-          cache: 'npm'
+## 🤝 Contributing
 
-      - name: Install dependencies
-        run: npm ci
+Feel free to submit issues and enhancement requests!
 
-      - name: Build project
-        run: npm run build && touch ./dist/.nojekyll  # ⚡ Adjust output folder if needed
+## 📄 License
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.6.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: public
-          folder: dist  # ⚡ Adjust to your build output folder (dist or out)
-```
-`Create a .env.example and commit to repo or you can paste env via GitHub actions when dispatch workflow`
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-4. Provided
-   - Repo > Settings > Pages > Branch (Select "public") > Save
+## 🙏 Acknowledgments
 
+This template uses [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) for GitHub Pages deployment. Please consider supporting their work!
