@@ -25,7 +25,7 @@ export default defineConfig({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
-  assetPrefix: process.env.BASE_PATH || ""
+  assetPrefix: "/tên-repo/", // ⚡ Đổi "tên-repo" thành tên repo của bạn
 };
 
 export default nextConfig;
@@ -115,9 +115,6 @@ jobs:
 
       - name: 🛠️ Tải packages
         run: yarn install
-
-      - name: 🔍 Tìm tên repository
-        run: echo "BASE_PATH=/$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2)" >> $GITHUB_ENV
 
       - name: 🏗️ Build dự án
         run: yarn run build && touch ./out/.nojekyll
