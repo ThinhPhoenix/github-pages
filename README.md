@@ -41,7 +41,7 @@ Dán đoạn code sau vào `deploy.yml`:
 
 ```Đối với Vite```<img src="https://skillicons.dev/icons?i=vite&theme=dark" width="20" height="20">
 ```yaml
-name: 🐈‍⬛ Deploy (Vite)
+name: Deploy🪽
 
 on:
   workflow_dispatch:
@@ -55,19 +55,52 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🛎️ Checkout repo
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: 📦 Cài Node.js
+      - name: Check required app secrets from .env.example
+        run: |
+          # Parse .env.example and collect variable names
+          required_secrets=()
+          while IFS= read -r line; do
+            # Skip comments, empty lines, and lines without '='
+            if [[ -z "$line" || "$line" =~ ^\# || "$line" != *"="* ]]; then
+              continue
+            fi
+            # Extract variable name (assuming format VAR=VALUE)
+            if [[ "$line" =~ ^[[:space:]]*([[:alnum:]_]+)= ]]; then
+              required_secrets+=("${BASH_REMATCH[1]}")
+            fi
+          done < .env.example
+
+          # Remove duplicate entries and log required secrets
+          readarray -t unique_secrets < <(printf '%s\n' "${required_secrets[@]}" | awk '!seen[$0]++')
+          echo "Required secrets from .env.example: ${unique_secrets[*]}"
+
+          # Check for missing secrets
+          missing=()
+          for secret in "${unique_secrets[@]}"; do
+            # Replace null/empty values with empty string for check
+            [[ -n "${!secret+x}" ]] || missing+=("$secret")
+          done
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "ERROR: Missing required secrets from .env.example: ${missing[*]}"
+            exit 1
+          else
+            echo "All required secrets are present."
+          fi
+
+      - name: Cài Node.js
         uses: actions/setup-node@v3
 
-      - name: 🛠️ Tải dependencies
+      - name: Tải dependencies
         uses: bahmutov/npm-install@v1
 
-      - name: 🏗️ Build dự án
+      - name: Build dự án
         run: npm run build
 
-      - name: 📤 Upload build artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: production-files
@@ -80,13 +113,13 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: 📥 Tải build artifacts
+      - name: Tải build artifacts
         uses: actions/download-artifact@v4
         with:
           name: production-files
           path: ./dist
 
-      - name: 🌐 Deploy lên nhánh gh-pages
+      - name: Deploy lên nhánh gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -95,7 +128,7 @@ jobs:
 
 ```Đối với Nextjs```<img src="https://skillicons.dev/icons?i=nextjs&theme=dark" width="20" height="20">
 ```yaml
-name: 🐈‍⬛ Deploy (Nextjs)
+name: Deploy🪽
 
 on:
   workflow_dispatch:
@@ -107,19 +140,52 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: 🛎️ Checkout repo
+      - name: Checkout repo
         uses: actions/checkout@v4.1.7
 
-      - name: 📦 Cài Node.js
+      - name: Check required app secrets from .env.example
+        run: |
+          # Parse .env.example and collect variable names
+          required_secrets=()
+          while IFS= read -r line; do
+            # Skip comments, empty lines, and lines without '='
+            if [[ -z "$line" || "$line" =~ ^\# || "$line" != *"="* ]]; then
+              continue
+            fi
+            # Extract variable name (assuming format VAR=VALUE)
+            if [[ "$line" =~ ^[[:space:]]*([[:alnum:]_]+)= ]]; then
+              required_secrets+=("${BASH_REMATCH[1]}")
+            fi
+          done < .env.example
+
+          # Remove duplicate entries and log required secrets
+          readarray -t unique_secrets < <(printf '%s\n' "${required_secrets[@]}" | awk '!seen[$0]++')
+          echo "Required secrets from .env.example: ${unique_secrets[*]}"
+
+          # Check for missing secrets
+          missing=()
+          for secret in "${unique_secrets[@]}"; do
+            # Replace null/empty values with empty string for check
+            [[ -n "${!secret+x}" ]] || missing+=("$secret")
+          done
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "ERROR: Missing required secrets from .env.example: ${missing[*]}"
+            exit 1
+          else
+            echo "All required secrets are present."
+          fi
+
+      - name: Cài Node.js
         uses: actions/setup-node@v4.0.2
 
-      - name: 🛠️ Tải packages
+      - name: Tải packages
         run: yarn install
 
-      - name: 🏗️ Build dự án
+      - name: Build dự án
         run: yarn run build && touch ./out/.nojekyll
 
-      - name: Deploy lên GitHub pages 🚀
+      - name: Deploy lên GitHub pages
         uses: JamesIves/github-pages-deploy-action@v4.6.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
