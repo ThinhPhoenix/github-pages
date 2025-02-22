@@ -44,10 +44,14 @@ Dán đoạn code sau vào `deploy.yml`:
 name: Deploy🪽
 
 on:
-  workflow_dispatch:
   push:
     branches:
-      - main # 🔄 Mỗi lần push lên main, workflow sẽ chạy
+      - main
+  workflow_dispatch:
+    inputs:
+      secrets_txt:
+        description: "Paste secrets here (format: KEY=VALUE)"
+        required: false
 
 jobs:
   build:
@@ -58,37 +62,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Check required app secrets from .env.example
+      - name: Import secrets
         run: |
-          # Parse .env.example and collect variable names
-          required_secrets=()
-          while IFS= read -r line; do
-            # Skip comments, empty lines, and lines without '='
-            if [[ -z "$line" || "$line" =~ ^\# || "$line" != *"="* ]]; then
-              continue
-            fi
-            # Extract variable name (assuming format VAR=VALUE)
-            if [[ "$line" =~ ^[[:space:]]*([[:alnum:]_]+)= ]]; then
-              required_secrets+=("${BASH_REMATCH[1]}")
-            fi
-          done < .env.example
-
-          # Remove duplicate entries and log required secrets
-          readarray -t unique_secrets < <(printf '%s\n' "${required_secrets[@]}" | awk '!seen[$0]++')
-          echo "Required secrets from .env.example: ${unique_secrets[*]}"
-
-          # Check for missing secrets
-          missing=()
-          for secret in "${unique_secrets[@]}"; do
-            # Replace null/empty values with empty string for check
-            [[ -n "${!secret+x}" ]] || missing+=("$secret")
-          done
-
-          if [ ${#missing[@]} -gt 0 ]; then
-            echo "ERROR: Missing required secrets from .env.example: ${missing[*]}"
-            exit 1
-          else
-            echo "All required secrets are present."
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ inputs.secrets_txt }}" ]; then
+            echo "${{ inputs.secrets_txt }}" > secrets.txt
+          elif [ -f .env.example ]; then
+            cp .env.example secrets.txt
+          fi
+          
+          if [ -f secrets.txt ]; then
+            while IFS='=' read -r key value; do
+              if [[ -n "$key" && -n "$value" && ! "$key" =~ ^# ]]; then
+                echo "$key=$value" >> $GITHUB_ENV
+              fi
+            done < secrets.txt
           fi
 
       - name: Cài Node.js
@@ -131,10 +118,14 @@ jobs:
 name: Deploy🪽
 
 on:
-  workflow_dispatch:
   push:
     branches:
-      - main # 🔄 Mỗi lần push lên main, workflow sẽ chạy
+      - main
+  workflow_dispatch:
+    inputs:
+      secrets_txt:
+        description: "Paste secrets here (format: KEY=VALUE)"
+        required: false
 
 jobs:
   build:
@@ -143,37 +134,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4.1.7
 
-      - name: Check required app secrets from .env.example
+      - name: Import secrets
         run: |
-          # Parse .env.example and collect variable names
-          required_secrets=()
-          while IFS= read -r line; do
-            # Skip comments, empty lines, and lines without '='
-            if [[ -z "$line" || "$line" =~ ^\# || "$line" != *"="* ]]; then
-              continue
-            fi
-            # Extract variable name (assuming format VAR=VALUE)
-            if [[ "$line" =~ ^[[:space:]]*([[:alnum:]_]+)= ]]; then
-              required_secrets+=("${BASH_REMATCH[1]}")
-            fi
-          done < .env.example
-
-          # Remove duplicate entries and log required secrets
-          readarray -t unique_secrets < <(printf '%s\n' "${required_secrets[@]}" | awk '!seen[$0]++')
-          echo "Required secrets from .env.example: ${unique_secrets[*]}"
-
-          # Check for missing secrets
-          missing=()
-          for secret in "${unique_secrets[@]}"; do
-            # Replace null/empty values with empty string for check
-            [[ -n "${!secret+x}" ]] || missing+=("$secret")
-          done
-
-          if [ ${#missing[@]} -gt 0 ]; then
-            echo "ERROR: Missing required secrets from .env.example: ${missing[*]}"
-            exit 1
-          else
-            echo "All required secrets are present."
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ inputs.secrets_txt }}" ]; then
+            echo "${{ inputs.secrets_txt }}" > secrets.txt
+          elif [ -f .env.example ]; then
+            cp .env.example secrets.txt
+          fi
+          
+          if [ -f secrets.txt ]; then
+            while IFS='=' read -r key value; do
+              if [[ -n "$key" && -n "$value" && ! "$key" =~ ^# ]]; then
+                echo "$key=$value" >> $GITHUB_ENV
+              fi
+            done < secrets.txt
           fi
 
       - name: Cài Node.js
