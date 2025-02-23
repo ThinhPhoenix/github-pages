@@ -45,7 +45,7 @@ jobs:
         run: bun install || (bun install && git add bun.lockb && git commit -m "chore: update bun.lockb" && git push)
 
       - name: Build project
-        run: bun run build && touch ./dist/.nojekyll
+        run: bun run build && touch ./dist/.nojekyll # ⚡ Adjust to your build output folder (dist or out)
 
 
       - name: Deploy to GitHub Pages
@@ -53,4 +53,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: public
-          folder: dist  # ⚡ Adjust to your build output folder (dist or out)
+          folder: dist # ⚡ Adjust to your build output folder (dist or out)
