@@ -79,7 +79,7 @@ name: Deploy 🕊️
 on:
   push:
     branches:
-      - main
+      - main #⚡Adjust to branch you want to deploy
   workflow_dispatch:
     inputs:
       secrets_txt:
@@ -142,7 +142,7 @@ jobs:
           fi
 
       - name: Build project
-        run: bun run build && touch ./dist/.nojekyll # ⚡ Adjust to your build output folder (dist or out)
+        run: bun run build && touch ./dist/.nojekyll #⚡Adjust to your build output folder (dist or out)
 
 
       - name: Deploy to GitHub Pages
@@ -150,7 +150,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: public
-          folder: dist # ⚡ Adjust to your build output folder (dist or out)
+          folder: dist #⚡Adjust to your build output folder (dist or out)
 ```
 
 ---
