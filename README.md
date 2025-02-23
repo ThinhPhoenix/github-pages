@@ -1,112 +1,196 @@
 # GitHub Actions Deployment Template
 
-A streamlined template for deploying Vite, NextJS, NuxtJS, ... applications to GitHub Pages using GitHub Actions, with secure environment variable handling.
+A well-structured template for deploying **Vite, Next.js, Nuxt.js**, and similar applications to **GitHub Pages** using **GitHub Actions**, ensuring secure environment variable management.
 
-> Special thanks to [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) for making this deployment process possible.
+> [!Note]
+> Special thanks to [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) and [rafgraph/spa-github-pages](https://github.com/rafgraph/spa-github-pages) for enabling this streamlined deployment process.
+
+---
 
 ## 🚀 Quick Start
 
-1. Enable GitHub Actions permissions:
-   ```
-   Repository > Settings > Actions > General > Workflow permissions > Read & Write
-   ```
+### 1. Enable GitHub Actions Permissions
+Navigate to:
+```
+Repository > Settings > Actions > General > Workflow permissions > Read & Write
+```
 
-2. Update the base URL in `vite.config.ts`:
-   ```typescript
-   import { defineConfig } from "vite";
-   import react from "@vitejs/plugin-react";
+### 2. Configure Base URL in `vite.config.ts`
+For **Vite-based projects**, set the correct base URL:
+```typescript
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-   export default defineConfig({
-     plugins: [react()],
-     base: "/your-repo-name/", // ⚡ Replace with your repository name
-   });
-   ```
+export default defineConfig({
+  plugins: [react()],
+  base: "/your-repo-name/", // ⚡ Replace with your repository name
+});
+```
 
-3. Create `.env.example` with your required environment variables:
-   ```
-   API_KEY=
-   DATABASE_URL=
-   ```
+### 3. Define Required Environment Variables
+Create an `.env.example` file listing the necessary variables:
+```
+API_KEY=
+DATABASE_URL=
+```
 
-4. Upload your environment variables to GitHub Secrets:
-   ```bash
-   gh secret set -f .env
-   ```
-   Note: GitHub CLI is required for this step.
+### 4. Secure Environment Variables Using GitHub Secrets
+To securely store environment variables, use GitHub CLI:
+```bash
+gh secret set -f .env
+```
+> Ensure GitHub CLI is installed before executing this command.
+
+---
 
 ## 📦 Features
 
-- Automated deployment to GitHub Pages
-- Secure environment variable handling
-- Configurable build settings
-- No Jekyll processing (`.nojekyll` file included)
+- ✅ Automated deployment to GitHub Pages  
+- ✅ Secure environment variable handling  
+- ✅ Configurable build and deployment settings  
+- ✅ Jekyll processing disabled (`.nojekyll` included)  
+
+---
 
 ## 🔧 Configuration
 
 ### GitHub Pages Setup
-
-1. Go to `Repository > Settings > Pages`
-2. Select `public` branch as the source
-3. Save your changes
+1. Navigate to **Repository > Settings > Pages**
+2. Set the source branch to `public`
+3. Click **Save**
 
 ### Workflow Configuration
-
 The deployment workflow is defined in `.github/workflows/deploy.yml` and includes:
+- Automated deployment on `main` branch pushes
+- Manual workflow execution with optional secret overrides
+- Node.js environment setup with npm caching
+- Secure injection of environment variables from GitHub Secrets
+- Build and deployment execution
 
-- Automatic deployment on pushes to main branch
-- Manual workflow dispatch with optional secret configuration
-- Node.js setup with npm caching
-- Environment variable injection from GitHub Secrets
-- Build and deployment steps
+```yml
+name: Deploy 🕊️
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      secrets_txt:
+        description: "Paste secrets here (format: KEY=VALUE)"
+        required: false
+
+jobs:
+  build_and_deploy:
+    name: Build & Deploy 🚀
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4.1.7
+
+      - name: Import secrets
+        env:
+          SECRETS_CONTEXT: ${{ toJSON(secrets) }}
+        run: |
+          # Get keys from .env.example
+          if [ -f .env.example ]; then
+            # Extract keys from .env.example, ignoring comments and empty lines
+            grep -v '^#' .env.example | grep -v '^$' | while IFS='=' read -r key value; do
+              # Trim whitespace from key
+              key=$(echo "$key" | xargs)
+              if [ -n "$key" ]; then
+                # Get secret value using jq
+                secret_value=$(echo "$SECRETS_CONTEXT" | jq -r ".[\"$key\"]")
+                if [ "$secret_value" != "null" ] && [ -n "$secret_value" ]; then
+                  echo "$key=$secret_value" >> $GITHUB_ENV
+                fi
+              fi
+            done
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.0.2
+        with:
+          cache: 'npm'  # Use npm instead of Yarn
+
+      - name: Install dependencies
+        run: npm ci  # Use npm ci for strict lockfile
+
+      - name: Build project
+        run: npm run build && touch ./dist/.nojekyll  # ⚡ Adjust output folder if needed
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4.6.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: public
+          folder: dist  # ⚡ Adjust to your build output folder (dist or out)
+```
+
+---
 
 ## 💡 Environment Variables
 
 Environment variables can be managed in two ways:
+1. **GitHub Secrets** (recommended for production)
+2. **Workflow dispatch input** (useful for testing purposes)
 
-1. Through GitHub Secrets (recommended for production)
-2. Via workflow dispatch input (useful for testing)
+---
 
 ## 🏗️ Build Configuration
 
-The default build configuration uses:
-- Output directory: `dist`
-- Base URL: `/repository-name/`
+| Setting             | Default Value        | Configuration File    |
+|--------------------|--------------------|---------------------|
+| **Output Directory** | `dist`              | `deploy.yml`         |
+| **Base URL**        | `/repository-name/` | `vite.config.ts`     |
 
-Adjust these settings in:
-- `vite.config.ts` for the base URL
-- `deploy.yml` for the build output folder
+These settings can be adjusted based on project requirements.
+
+---
 
 ## 📝 Usage
 
 ### Automatic Deployment
-
-Push to the main branch to trigger automatic deployment:
+Deploy automatically by pushing changes to the `main` branch:
 ```bash
 git push origin main
 ```
 
 ### Manual Deployment
+1. Navigate to **Actions** in the repository
+2. Select the **Deploy 🕊️** workflow
+3. Click **Run workflow**
+4. (Optional) Provide secrets in `KEY=VALUE` format
 
-1. Go to Actions tab in your repository
-2. Select "Deploy🪽" workflow
-3. Click "Run workflow"
-4. Optionally add secrets in KEY=VALUE format
+---
 
-## ⚠️ Important Notes
+## ⚠️ Important Considerations
 
-- Ensure your repository name matches the base URL in `vite.config.ts`
-- Keep your `.env.example` file updated with required variable names
-- Never commit actual secret values to the repository
-- The public branch will be created automatically on first deployment
+> [!Warning]
+> - Ensure the repository name matches the base URL in `vite.config.ts`.
+> - Maintain an up-to-date `.env.example` file with required variables.
+> - **Do not** commit actual secret values to the repository.
+> - The `public` branch is automatically generated upon the first deployment.
+
+---
 
 ## 🤝 Contributing
 
-Feel free to submit issues and enhancement requests!
+Contributions and improvements are welcome! Feel free to submit issues or feature requests.
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is distributed under the **MIT License**. Refer to the `LICENSE` file for more details.
+
+---
 
 ## 🙏 Acknowledgments
 
-This template uses [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) for GitHub Pages deployment. Please consider supporting their work!
+This deployment template is powered by:
+- [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action)
+- [rafgraph/spa-github-pages](https://github.com/rafgraph/spa-github-pages)
+
+Consider supporting their valuable contributions!
+
