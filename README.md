@@ -174,6 +174,7 @@ git push origin main
 > - Maintain an up-to-date `.env.example` file with required variables.
 > - **Do not** commit actual secret values to the repository.
 > - The `public` branch is automatically generated upon the first deployment.
+> - `404.html` and `index.html` are used to fix GitHub Pages 404 errors when refreshing a page.
 
 ---
 
