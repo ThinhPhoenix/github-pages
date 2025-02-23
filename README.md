@@ -112,16 +112,15 @@ jobs:
             done
           fi
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.0.2
-        with:
-          cache: 'npm'  # Use npm instead of Yarn
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
 
       - name: Install dependencies
-        run: npm ci  # Use npm ci for strict lockfile
+        run: bun install || (bun install && git add bun.lockb && git commit -m "chore: update bun.lockb" && git push)
 
       - name: Build project
-        run: npm run build && touch ./dist/.nojekyll  # ⚡ Adjust output folder if needed
+        run: bun run build && touch ./dist/.nojekyll
+
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.6.0
