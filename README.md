@@ -5,6 +5,8 @@ A well-structured template for deploying **Vite, Next.js, Nuxt.js**, and similar
 > [!Note]
 > Special thanks to [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) and [rafgraph/spa-github-pages](https://github.com/rafgraph/spa-github-pages) for enabling this streamlined deployment process.
 
+![image](https://github.com/user-attachments/assets/99f76422-edfd-4fa1-ae48-77996cc433f6)
+
 ---
 
 ## 🚀 Quick Start
@@ -39,7 +41,9 @@ To securely store environment variables, use GitHub CLI:
 ```bash
 gh secret set -f .env
 ```
-> Ensure GitHub CLI is installed before executing this command.
+> [!Note]
+> Ensure GitHub CLI is installed before executing this command. You can download GitHub CLI here: [GitHub CLI](https://cli.github.com/).  
+> Alternatively, you can manually add secrets to **GitHub Actions Secrets** via **Repository > Settings > Secrets and variables > Actions**.
 
 ---
 
