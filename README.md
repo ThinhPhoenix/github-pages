@@ -118,7 +118,28 @@ jobs:
         uses: oven-sh/setup-bun@v1
 
       - name: Install dependencies
-        run: bun install || (bun install && git add bun.lockb && git commit -m "chore: update bun.lockb" && git push)
+        run: |
+          bun install
+          if [ -f bun.lockb ]; then
+            if git ls-files --error-unmatch bun.lockb > /dev/null 2>&1; then
+              if ! git diff --quiet bun.lockb; then
+                git config --global user.name "github-actions[bot]"
+                git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                git add bun.lockb
+                git commit -m "chore: update bun.lockb"
+                git push
+              fi
+            else
+              echo "bun.lockb is not tracked by Git. Adding it..."
+              git config --global user.name "github-actions[bot]"
+              git config --global user.email "github-actions[bot]@users.noreply.github.com"
+              git add bun.lockb
+              git commit -m "chore: add bun.lockb"
+              git push
+            fi
+          else
+            echo "bun.lockb does not exist. Skipping commit."
+          fi
 
       - name: Build project
         run: bun run build && touch ./dist/.nojekyll # ⚡ Adjust to your build output folder (dist or out)
