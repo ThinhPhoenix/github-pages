@@ -32,9 +32,11 @@ export default defineConfig({
 ### 3. Define Required Environment Variables
 Create an `.env.example` file listing the necessary variables:
 ```.env
-API_KEY=
-DATABASE_URL=
+API_KEY=YOUR_API_KEY
+DATABASE_URL=YOUR_DATABASE_URL
 ```
+>[!Warning]
+>`.env.example` not `.env` becareful not commit your secrets.
 
 ### 4. Secure Environment Variables Using GitHub Secrets
 To securely store environment variables, use GitHub CLI:
