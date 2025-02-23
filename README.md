@@ -31,7 +31,7 @@ export default defineConfig({
 
 ### 3. Define Required Environment Variables
 Create an `.env.example` file listing the necessary variables:
-```
+```.env
 API_KEY=
 DATABASE_URL=
 ```
