@@ -1,36 +1,33 @@
-name: Update README with Deploy Workflow
+name: Update README with deploy.yml
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual execution
+  schedule:
+    - cron: "0 0 * * *" # Runs daily
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Fetch deploy.yml content
-        id: fetch_workflow
+      - name: Fetch latest deploy.yml
         run: |
-          echo '```yml' > workflow.txt
-          cat ./deploy.yml >> workflow.txt
-          echo '```' >> workflow.txt
+          curl -sL "https://raw.githubusercontent.com/ThinhPhoenix/github-pages/refs/heads/main/deploy.yml" -o deploy.yml
 
-      - name: Replace YAML block in README
+      - name: Update README.md
         run: |
-          awk '/```yml/,/```/' README.md > old_workflow.txt || true
-          if ! cmp -s workflow.txt old_workflow.txt; then
-            awk 'NR==FNR{if (/```yml/) {print_found=1} if (print_found && /```/) {exit} next} 1' README.md workflow.txt > temp.md
-            mv temp.md README.md
-            echo "README updated"
-          else
-            echo "No changes detected"
-            exit 0
-          fi
+          # Extract deploy.yml content
+          DEPLOY_CONTENT=$(awk '{print "    " $0}' deploy.yml)
+
+          # Replace ```yml ... ``` in README.md
+          awk -v content="$DEPLOY_CONTENT" '
+            BEGIN { inside_block=0 }
+            /^```yml$/ { print; inside_block=1; print content; next }
+            /^```$/ && inside_block { inside_block=0; next }
+            !inside_block { print }
+          ' README.md > README.tmp && mv README.tmp README.md
 
       - name: Commit and push changes
         run: |
@@ -38,8 +35,6 @@ jobs:
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
             git add README.md
-            git commit -m "docs: auto-update deploy workflow in README"
+            git commit -m "chore: update deploy.yml in README"
             git push
-          else
-            echo "No changes to commit"
           fi
