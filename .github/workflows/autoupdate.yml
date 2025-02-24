@@ -2,8 +2,6 @@ name: Update README with deploy.yml
 
 on:
   workflow_dispatch: # Allows manual execution
-  schedule:
-    - cron: "0 0 * * *" # Runs daily
 
 jobs:
   update-readme:
