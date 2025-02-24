@@ -18,7 +18,7 @@ Repository > Settings > Actions > General > Workflow permissions > Read & Write
 
 ### 2. Configure Base URL in vite.config.ts
 For **Vite-based projects**, set the correct base URL:
-typescript
+```typescript
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -26,14 +26,14 @@ export default defineConfig({
   plugins: [react()],
   base: "/your-repo-name/", //⚡Replace with your repository name
 });
-
+```
 
 ### 3. Define Required Environment Variables
 Create an .env.example file listing the necessary variables:
-.env
+```.env
 API_KEY=YOUR_API_KEY
 DATABASE_URL=YOUR_DATABASE_URL
-
+```
 >[!Warning]
 >.env.example not .env becareful not commit your secrets.
 
@@ -72,7 +72,7 @@ The deployment workflow is defined in .github/workflows/deploy.yml and includes:
 - Secure injection of environment variables from GitHub Secrets
 - Build and deployment execution
 
-yml
+```yml
 name: Deploy 🕊️
 
 on:
@@ -150,7 +150,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: public
           folder: dist #⚡Adjust to your build output folder (dist or out)
-
+```
 
 ---
 
