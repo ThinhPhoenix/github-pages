@@ -1,0 +1,45 @@
+name: Update README with Deploy Workflow
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch deploy.yml content
+        id: fetch_workflow
+        run: |
+          echo '```yml' > workflow.txt
+          cat ./deploy.yml >> workflow.txt
+          echo '```' >> workflow.txt
+
+      - name: Replace YAML block in README
+        run: |
+          awk '/```yml/,/```/' README.md > old_workflow.txt || true
+          if ! cmp -s workflow.txt old_workflow.txt; then
+            awk 'NR==FNR{if (/```yml/) {print_found=1} if (print_found && /```/) {exit} next} 1' README.md workflow.txt > temp.md
+            mv temp.md README.md
+            echo "README updated"
+          else
+            echo "No changes detected"
+            exit 0
+          fi
+
+      - name: Commit and push changes
+        run: |
+          if ! git diff --quiet; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add README.md
+            git commit -m "docs: auto-update deploy workflow in README"
+            git push
+          else
+            echo "No changes to commit"
+          fi
