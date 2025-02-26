@@ -219,3 +219,10 @@ This deployment template is powered by:
 - [rafgraph/spa-github-pages](https://github.com/rafgraph/spa-github-pages)
 
 Consider supporting their valuable contributions!
+
+---
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ThinhPhoenix/github-pages&type=Date)](https://star-history.com/#ThinhPhoenix/github-pages&Date)
+
