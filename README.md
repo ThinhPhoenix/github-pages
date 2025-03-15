@@ -3,7 +3,7 @@
 A well-structured template for deploying **Vite, Next.js, Nuxt.js**, and similar applications to **GitHub Pages** using **GitHub Actions**, ensuring secure environment variable management.
 
 > [!Note]
-> Special thanks to [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) and [rafgraph/spa-github-pages](https://github.com/rafgraph/spa-github-pages) for enabling this streamlined deployment process.
+> (づ｡◕‿‿◕｡)づ Special thanks to [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) and [rafgraph/spa-github-pages](https://github.com/rafgraph/spa-github-pages) for enabling this streamlined deployment process.
 
 ![image](https://github.com/user-attachments/assets/99f76422-edfd-4fa1-ae48-77996cc433f6)
 
@@ -13,7 +13,7 @@ A well-structured template for deploying **Vite, Next.js, Nuxt.js**, and similar
 
 ### 1. Enable GitHub Actions Permissions
 Navigate to:
-Repository > Settings > Actions > General > Workflow permissions > Read & Write
+`Repository ▸ Settings ▸ Actions ▸ General ▸ Workflow permissions ▸ Read & Write`
 
 
 ### 2. Configure Base URL in vite.config.ts
@@ -24,7 +24,7 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/your-repo-name/", //⚡Replace with your repository name
+  base: "/your-repo-name/", //🗲Replace with your repository name
 });
 ```
 
@@ -50,19 +50,19 @@ gh secret set -f .env
 
 ## 📦 Features
 
-- ✅ Automated deployment to GitHub Pages  
-- ✅ Secure environment variable handling  
-- ✅ Configurable build and deployment settings  
-- ✅ Jekyll processing disabled (.nojekyll included)  
+- ✓ Automated deployment to GitHub Pages  
+- ✓ Secure environment variable handling  
+- ✓ Configurable build and deployment settings  
+- ✓ Jekyll processing disabled (.nojekyll included)  
 
 ---
 
 ## 🔧 Configuration
 
 ### GitHub Pages Setup
-1. Navigate to **Repository > Settings > Pages**
+1. Navigate to: `Repository ▸ Settings ▸ Pages`
 2. Set the source branch to public
-3. Click **Save**
+3. Click `Save` ٩(●ᴗ●)۶
 
 ### Workflow Configuration
 The deployment workflow is defined in .github/workflows/deploy.yml and includes:
@@ -78,7 +78,7 @@ name: Deploy 🕊️
 on:
   push:
     branches:
-      - main #⚡Adjust to branch you want to deploy
+      - main #🗲Adjust to branch you want to deploy
   workflow_dispatch:
     inputs:
       secrets_txt:
@@ -141,7 +141,7 @@ jobs:
           fi
 
       - name: Build project
-        run: bun run build && touch ./dist/.nojekyll #⚡Adjust to your build output folder (dist or out)
+        run: bun run build && touch ./dist/.nojekyll #🗲Adjust to your build output folder (dist or out)
 
 
       - name: Deploy to GitHub Pages
@@ -149,7 +149,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: public
-          folder: dist #⚡Adjust to your build output folder (dist or out)
+          folder: dist #🗲Adjust to your build output folder (dist or out)
 ```
 
 ---
