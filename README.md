@@ -79,7 +79,7 @@ name: Deploy 🕊️
 on:
   push:
     branches:
-      - main #🗲Adjust to branch you want to deploy
+      - main #✎ Adjust to branch you want to deploy
   workflow_dispatch:
     inputs:
       secrets_txt:
