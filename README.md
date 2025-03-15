@@ -3,7 +3,7 @@
 A well-structured template for deploying **Vite, Next.js, Nuxt.js**, and similar applications to **GitHub Pages** using **GitHub Actions**, ensuring secure environment variable management.
 
 > [!Note]
-> (づ｡◕‿‿◕｡)づ Special thanks to [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) and [rafgraph/spa-github-pages](https://github.com/rafgraph/spa-github-pages) for enabling this streamlined deployment process.
+> Special thanks to [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) and [rafgraph/spa-github-pages](https://github.com/rafgraph/spa-github-pages) for enabling this streamlined deployment process.
 
 ![image](https://github.com/user-attachments/assets/99f76422-edfd-4fa1-ae48-77996cc433f6)
 
@@ -24,9 +24,10 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/your-repo-name/", //🗲Replace with your repository name
+  base: "/your-repo-name/", //✎ Replace with your repository name
 });
 ```
+> ༼ つ ◕_◕ ༽つ If your project not vite-based then check for config file to change your root base
 
 ### 3. Define Required Environment Variables
 Create an .env.example file listing the necessary variables:
@@ -62,7 +63,7 @@ gh secret set -f .env
 ### GitHub Pages Setup
 1. Navigate to: `Repository ▸ Settings ▸ Pages`
 2. Set the source branch to public
-3. Click `Save` ٩(●ᴗ●)۶
+3. Click `Save`
 
 ### Workflow Configuration
 The deployment workflow is defined in .github/workflows/deploy.yml and includes:
@@ -141,7 +142,7 @@ jobs:
           fi
 
       - name: Build project
-        run: bun run build && touch ./dist/.nojekyll #🗲Adjust to your build output folder (dist or out)
+        run: bun run build && touch ./dist/.nojekyll #✎ Adjust to your build output folder (dist or out)
 
 
       - name: Deploy to GitHub Pages
@@ -149,7 +150,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: public
-          folder: dist #🗲Adjust to your build output folder (dist or out)
+          folder: dist #✎ Adjust to your build output folder (dist or out)
 ```
 
 ---
