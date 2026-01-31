@@ -5,88 +5,40 @@
   <div class="bg-[#161616] border border-white/10 overflow-hidden text-left">
     <!-- Package Manager Tabs -->
     <div class="flex border-b border-white/10">
-      <button onclick="switchPmTab('curl')" id="pm-curl" class="pm-tab px-5 py-3 text-sm text-white border-b-2 border-white font-mono transition-colors">
-        curl
-      </button>
-      <button onclick="switchPmTab('npm')" id="pm-npm" class="pm-tab px-5 py-3 text-sm text-gray-500 hover:text-gray-300 font-mono transition-colors">
+      <button onclick="switchPmTab('npm')" id="pm-npm" class="pm-tab px-5 py-3 text-sm text-white border-b-2 border-white font-mono transition-colors">
         npm
       </button>
       <button onclick="switchPmTab('bun')" id="pm-bun" class="pm-tab px-5 py-3 text-sm text-gray-500 hover:text-gray-300 font-mono transition-colors">
         bun
       </button>
-      <button onclick="switchPmTab('brew')" id="pm-brew" class="pm-tab px-5 py-3 text-sm text-gray-500 hover:text-gray-300 font-mono transition-colors">
-        brew
-      </button>
-      <button onclick="switchPmTab('paru')" id="pm-paru" class="pm-tab px-5 py-3 text-sm text-gray-500 hover:text-gray-300 font-mono transition-colors">
-        paru
-      </button>
     </div>
     
     <!-- Code Content -->
     <div class="p-4">
-      <!-- curl -->
-      <div id="code-curl" class="pm-content">
-        <div class="flex items-center justify-between">
-          <code class="font-mono text-sm text-gray-300">
-            curl -fsSL <span class="text-blue-400">https://github.com/ThinhPhoenix/github-pages</span> | node
-          </code>
-          <button onclick="copyCode('curl-cmd')" class="text-gray-500 hover:text-white transition-colors ml-4">
-            <i class="ph ph-copy"></i>
-          </button>
-        </div>
-        <code id="curl-cmd" class="hidden">curl -fsSL https://github.com/ThinhPhoenix/github-pages | node</code>
-      </div>
-      
       <!-- npm -->
-      <div id="code-npm" class="pm-content hidden">
+      <div id="code-npm" class="pm-content">
         <div class="flex items-center justify-between">
           <code class="font-mono text-sm text-gray-300">
-            npx <span class="text-blue-400">github-pages</span> init
+            npx <span class="text-blue-400">@thinhphoenix/github-pages</span>
           </code>
           <button onclick="copyCode('npm-cmd')" class="text-gray-500 hover:text-white transition-colors ml-4">
             <i class="ph ph-copy"></i>
           </button>
         </div>
-        <code id="npm-cmd" class="hidden">npx github-pages init</code>
+        <code id="npm-cmd" class="hidden">npx @thinhphoenix/github-pages</code>
       </div>
       
       <!-- bun -->
       <div id="code-bun" class="pm-content hidden">
         <div class="flex items-center justify-between">
           <code class="font-mono text-sm text-gray-300">
-            bunx <span class="text-blue-400">github-pages</span> init
+            bunx <span class="text-blue-400">@thinhphoenix/github-pages</span>
           </code>
           <button onclick="copyCode('bun-cmd')" class="text-gray-500 hover:text-white transition-colors ml-4">
             <i class="ph ph-copy"></i>
           </button>
         </div>
-        <code id="bun-cmd" class="hidden">bunx github-pages init</code>
-      </div>
-      
-      <!-- brew -->
-      <div id="code-brew" class="pm-content hidden">
-        <div class="flex items-center justify-between">
-          <code class="font-mono text-sm text-gray-300">
-            brew install <span class="text-blue-400">github-pages</span>
-          </code>
-          <button onclick="copyCode('brew-cmd')" class="text-gray-500 hover:text-white transition-colors ml-4">
-            <i class="ph ph-copy"></i>
-          </button>
-        </div>
-        <code id="brew-cmd" class="hidden">brew install github-pages</code>
-      </div>
-      
-      <!-- paru -->
-      <div id="code-paru" class="pm-content hidden">
-        <div class="flex items-center justify-between">
-          <code class="font-mono text-sm text-gray-300">
-            paru -S <span class="text-blue-400">github-pages</span>
-          </code>
-          <button onclick="copyCode('paru-cmd')" class="text-gray-500 hover:text-white transition-colors ml-4">
-            <i class="ph ph-copy"></i>
-          </button>
-        </div>
-        <code id="paru-cmd" class="hidden">paru -S github-pages</code>
+        <code id="bun-cmd" class="hidden">bunx @thinhphoenix/github-pages</code>
       </div>
     </div>
   </div>
