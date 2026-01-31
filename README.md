@@ -16,7 +16,7 @@ A well-structured template for deploying **Vite, Next.js, Nuxt.js**, and similar
 Run the universal setup script (works on **Windows, macOS, and Linux**):
 
 ```bash
-curl -L https://cdn.jsdelivr.net/gh/ThinhPhoenix/github-pages@main/init.js | node
+curl -L https://cdn.jsdelivr.net/gh/ThinhPhoenix/github-pages@main/init.min.js | node
 ```
 
 This downloads and executes the init script directly from CDN.
