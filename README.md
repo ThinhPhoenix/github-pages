@@ -79,13 +79,6 @@ gh secret set -f .env
 
 ### GitHub Pages Setup
 
-**Option A - Using GitHub CLI (Recommended):**
-```bash
-gh api -X PUT /repos/$(gh repo view --json nameWithOwner -q .nameWithOwner)/pages \
-  -f source='{"branch":"public","path":"/"}'
-```
-
-**Option B - Manual Setup:**
 1. Navigate to: `Repository ▸ Settings ▸ Pages`
 2. Set the source branch to public
 3. Click `Save`
