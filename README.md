@@ -29,14 +29,11 @@ export default defineConfig({
 ```
 > ༼ つ ◕_◕ ༽つ If your project not vite-based then check for config file to change your root base
 
-### 3. Define Required Environment Variables
-Create an .env.example file listing the necessary variables:
-```.env
-API_KEY=YOUR_API_KEY
-DATABASE_URL=YOUR_DATABASE_URL
-```
->[!Warning]
->.env.example not .env becareful not commit your secrets.
+### 3. Configure Environment Variables
+All secrets stored in GitHub Actions Secrets are automatically injected into the build environment. Simply add your secrets via GitHub CLI or the web interface.
+
+> [!Warning]
+> **Do not** commit actual secret values to the repository.
 
 ### 4. Secure Environment Variables Using GitHub Secrets
 To securely store environment variables, use GitHub CLI:
@@ -66,11 +63,11 @@ gh secret set -f .env
 3. Click `Save`
 
 ### Workflow Configuration
-The deployment workflow is defined in .github/workflows/deploy.yml and includes:
+The deployment workflow is defined in `.github/workflows/deploy.yml` and includes:
 - Automated deployment on main branch pushes
 - Manual workflow execution with optional secret overrides
-- Node.js environment setup with npm caching
-- Secure injection of environment variables from GitHub Secrets
+- Bun runtime setup with caching
+- Automatic injection of all GitHub Secrets into the build environment
 - Build and deployment execution
 
 ```yml
@@ -83,7 +80,7 @@ on:
   workflow_dispatch:
     inputs:
       secrets_txt:
-        description: "Paste secrets here (format: KEY=VALUE)"
+        description: 'Paste secrets here (format: KEY=VALUE)'
         required: false
 
 jobs:
@@ -98,21 +95,7 @@ jobs:
         env:
           SECRETS_CONTEXT: ${{ toJSON(secrets) }}
         run: |
-          # Get keys from .env.example
-          if [ -f .env.example ]; then
-            # Extract keys from .env.example, ignoring comments and empty lines
-            grep -v '^#' .env.example | grep -v '^$' | while IFS='=' read -r key value; do
-              # Trim whitespace from key
-              key=$(echo "$key" | xargs)
-              if [ -n "$key" ]; then
-                # Get secret value using jq
-                secret_value=$(echo "$SECRETS_CONTEXT" | jq -r ".[\"$key\"]")
-                if [ "$secret_value" != "null" ] && [ -n "$secret_value" ]; then
-                  echo "$key=$secret_value" >> $GITHUB_ENV
-                fi
-              fi
-            done
-          fi
+          echo "$SECRETS_CONTEXT" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> "$GITHUB_ENV"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -143,7 +126,6 @@ jobs:
 
       - name: Build project
         run: bun run build && touch ./dist/.nojekyll #✎ Adjust to your build output folder (dist or out)
-
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.6.0
@@ -194,7 +176,6 @@ git push origin main
 
 > [!Warning]
 > - Ensure the repository name matches the base URL in vite.config.ts.
-> - Maintain an up-to-date .env.example file with required variables.
 > - **Do not** commit actual secret values to the repository.
 > - The public branch is automatically generated upon the first deployment.
 > - 404.html(place inside ./public) and index.html are used to fix GitHub Pages 404 errors when refreshing a page.
