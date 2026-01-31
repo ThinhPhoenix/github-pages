@@ -1,0 +1,67 @@
+---
+---
+
+<section id="faq" class="py-16 px-4 sm:px-6">
+  <div class="max-w-2xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-8 text-center">FAQ</h2>
+    
+    <div class="space-y-2">
+      <div class="faq-item border-b border-white/10">
+        <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+          <span class="font-medium">Do I need a custom domain?</span>
+          <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+        </button>
+        <div class="faq-content hidden pb-4 text-gray-400 text-sm">
+          No, you get a free username.github.io/repo-name URL. Custom domains are optional.
+        </div>
+      </div>
+
+      <div class="faq-item border-b border-white/10">
+        <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+          <span class="font-medium">How long does deployment take?</span>
+          <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+        </button>
+        <div class="faq-content hidden pb-4 text-gray-400 text-sm">
+          Usually 1-2 minutes from push to live site.
+        </div>
+      </div>
+
+      <div class="faq-item border-b border-white/10">
+        <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+          <span class="font-medium">Is it free?</span>
+          <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+        </button>
+        <div class="faq-content hidden pb-4 text-gray-400 text-sm">
+          Yes, GitHub Pages is free for public repositories with 100GB bandwidth/month.
+        </div>
+      </div>
+
+      <div class="faq-item border-b border-white/10">
+        <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+          <span class="font-medium">Can I use environment variables?</span>
+          <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+        </button>
+        <div class="faq-content hidden pb-4 text-gray-400 text-sm">
+          Yes, add secrets in GitHub Settings → Secrets and variables → Actions.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  function toggleFaq(button) {
+    var content = button.nextElementSibling;
+    var icon = button.querySelector('.faq-icon');
+    
+    if (content && icon) {
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        content.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+  }
+</script>

@@ -1,0 +1,18 @@
+---
+import GithubStarButton from './github-star-button.astro';
+---
+
+<nav class="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-md border-b border-white/10">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between h-14">
+      <div class="flex items-center gap-2">
+        <span class="font-display text-xl">github-pages</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="#features" class="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
+        <a href="#faq" class="text-sm text-gray-400 hover:text-white transition-colors">FAQ</a>
+        <GithubStarButton />
+      </div>
+    </div>
+  </div>
+</nav>

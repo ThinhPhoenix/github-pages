@@ -1,0 +1,25 @@
+---
+import InstallCodeBlock from './install-code-block.astro';
+---
+
+<section class="pt-28 pb-16 px-4 sm:px-6">
+  <div class="max-w-3xl mx-auto text-center">
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 mb-6">
+      <span class="w-1.5 h-1.5 bg-green-400"></span>
+      <span class="text-xs font-medium text-gray-300">Happy New Year 2026! 🎉</span>
+    </div>
+
+    <!-- Main headline -->
+    <h1 class="font-black uppercase text-xl sm:text-2xl lg:text-3xl mb-4 tracking-tight leading-tight">
+      Deploy static sites to <span class="text-blue-400">GitHub Pages</span>
+    </h1>
+    
+    <p class="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
+      Free hosting with automated CI/CD. Works with Vite, Next.js, Nuxt.js, React, Vue, and more.
+    </p>
+
+    <!-- Install Code Block -->
+    <InstallCodeBlock />
+  </div>
+</section>
