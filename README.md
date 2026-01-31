@@ -19,8 +19,7 @@ gh api -X PUT /repos/{owner}/{repo}/actions/permissions/workflow -f default_work
 ```
 Or for current repository:
 ```bash
-REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
-gh api -X PUT /repos/$REPO/actions/permissions/workflow -f default_workflow_permissions='write'
+gh api -X PUT /repos/$(gh repo view --json nameWithOwner -q .nameWithOwner)/actions/permissions/workflow -f default_workflow_permissions='write'
 ```
 
 **Option B - Manual Setup:**
