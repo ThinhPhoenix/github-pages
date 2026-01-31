@@ -188,7 +188,38 @@ git push origin main
 > - Ensure the repository name matches the base URL in vite.config.ts.
 > - **Do not** commit actual secret values to the repository.
 > - The public branch is automatically generated upon the first deployment.
-> - 404.html(place inside ./public) and index.html are used to fix GitHub Pages 404 errors when refreshing a page.
+> - **Fix SPA GitHub Pages 404 Error:** 
+>   1. Place `404.html` (from `./public`) at the root of your deployed site. This file redirects all 404s back to `index.html` with the original path preserved in the query string.
+>   2. Add the following script to your `index.html` **inside the `<head>` tag** (before any other scripts):
+>      ```html
+>      <!-- Start Single Page Apps for GitHub Pages -->
+>      <script type="text/javascript">
+>        // Single Page Apps for GitHub Pages
+>        // MIT License
+>        // https://github.com/rafgraph/spa-github-pages
+>        // This script checks to see if a redirect is present in the query string,
+>        // converts it back into the correct url and adds it to the
+>        // browser's history using window.history.replaceState(...),
+>        // which won't cause the browser to attempt to load the new url.
+>        // When the single page app is loaded further down in this file,
+>        // the correct url will be waiting in the browser's history for
+>        // the single page app to route accordingly.
+>        (function(l) {
+>          if (l.search[1] === '/' ) {
+>            var decoded = l.search.slice(1).split('&').map(function(s) { 
+>              return s.replace(/~and~/g, '&')
+>            }).join('?');
+>            window.history.replaceState(null, null,
+>                l.pathname.slice(0, -1) + decoded + l.hash
+>            );
+>          }
+>        }(window.location))
+>      </script>
+>      <!-- End Single Page Apps for GitHub Pages -->
+>      ```
+>   - This allows client-side routing to work correctly when refreshing or accessing deep links directly (e.g., `/about`, `/user/123`).
+>   - For React Router, Vue Router, or other SPA frameworks, this ensures routes work on refresh.
+>   - Special thanks to [rafgraph/spa-github-pages](https://github.com/rafgraph/spa-github-pages) for this solution.
 
 ---
 
