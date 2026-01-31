@@ -209,12 +209,24 @@ async function waitForBuild() {
   for (let i = 0; i < maxAttempts; i++) {
     try {
       const branches = exec(`gh api repos/${repo}/branches --jq '.[].name'`, true).trim();
-      if (branches.split('\n').includes('public')) {
+      const branchList = branches.split('\n');
+      // Debug: log what we found
+      if (i === 0) {
+        console.log();
+        info(`Branches found: ${branchList.join(', ')}`);
+      }
+      if (branchList.includes('public')) {
         console.log();
         success('Build completed! Public branch created');
         return true;
       }
-    } catch {}
+    } catch (err) {
+      // Debug: log errors
+      if (i === 0) {
+        console.log();
+        info(`Error checking branches: ${err}`);
+      }
+    }
     
     process.stdout.write(`\r${gray('│')} Elapsed: ${i * 5}s`);
     await new Promise(r => setTimeout(r, 5000));
