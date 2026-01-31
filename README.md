@@ -11,7 +11,19 @@ A well-structured template for deploying **Vite, Next.js, Nuxt.js**, and similar
 
 ## 🚀 Quick Start
 
-### 1. Enable GitHub Actions Permissions
+### 1. Initialize Deploy Configuration
+
+Run the universal setup script (works on **Windows, macOS, and Linux**):
+
+```bash
+curl -L https://cdn.jsdelivr.net/gh/ThinhPhoenix/github-pages@main/init.js | node
+```
+
+This downloads and executes the init script directly from CDN.
+
+---
+
+### 2. Enable GitHub Actions Permissions
 
 **Option A - Using GitHub CLI (Recommended):**
 ```bash
@@ -24,7 +36,7 @@ gh api -X PUT /repos/$(gh repo view --json nameWithOwner -q .nameWithOwner)/acti
 Navigate to: `Repository ▸ Settings ▸ Actions ▸ General ▸ Workflow permissions ▸ Read & Write`
 
 
-### 2. Configure Base URL in vite.config.ts
+### 3. Configure Base URL in vite.config.ts
 For **Vite-based projects**, set the correct base URL:
 ```typescript
 import { defineConfig } from "vite";
@@ -37,13 +49,13 @@ export default defineConfig({
 ```
 > ༼ つ ◕_◕ ༽つ If your project not vite-based then check for config file to change your root base
 
-### 3. Configure Environment Variables
+### 4. Configure Environment Variables
 All secrets stored in GitHub Actions Secrets are automatically injected into the build environment. Simply add your secrets via GitHub CLI or the web interface.
 
 > [!Warning]
 > **Do not** commit actual secret values to the repository.
 
-### 4. Secure Environment Variables Using GitHub Secrets
+### 5. Secure Environment Variables Using GitHub Secrets
 To securely store environment variables, use GitHub CLI:
 bash
 gh secret set -f .env
