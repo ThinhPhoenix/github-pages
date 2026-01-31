@@ -47,20 +47,10 @@ async function downloadFile(url, outputPath) {
 
 async function main() {
   try {
-    console.log('Creating .github/workflows directory...');
     await mkdir('.github/workflows', { recursive: true });
-    
-    console.log('Downloading deploy.yml...');
     await downloadFile(DEPLOY_URL, OUTPUT_PATH);
-    
-    console.log('\n✅ Success! deploy.yml downloaded to .github/workflows/deploy.yml');
-    console.log('\nNext steps:');
-    console.log('1. Push this file to your repository');
-    console.log('2. Configure GitHub Pages in repository settings');
-    console.log('3. Add your secrets via GitHub CLI or web interface');
-    
   } catch (error) {
-    console.error('\n❌ Error:', error.message);
+    console.error('\nError:', error.message);
     process.exit(1);
   }
 }
