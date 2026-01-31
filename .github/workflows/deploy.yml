@@ -3,11 +3,11 @@ name: Deploy 🕊️
 on:
   push:
     branches:
-      - main #⚡Adjust to branch you want to deploy
+      - main #✎ Adjust to branch you want to deploy
   workflow_dispatch:
     inputs:
       secrets_txt:
-        description: "Paste secrets here (format: KEY=VALUE)"
+        description: 'Paste secrets here (format: KEY=VALUE)'
         required: false
 
 jobs:
@@ -22,21 +22,7 @@ jobs:
         env:
           SECRETS_CONTEXT: ${{ toJSON(secrets) }}
         run: |
-          # Get keys from .env.example
-          if [ -f .env.example ]; then
-            # Extract keys from .env.example, ignoring comments and empty lines
-            grep -v '^#' .env.example | grep -v '^$' | while IFS='=' read -r key value; do
-              # Trim whitespace from key
-              key=$(echo "$key" | xargs)
-              if [ -n "$key" ]; then
-                # Get secret value using jq
-                secret_value=$(echo "$SECRETS_CONTEXT" | jq -r ".[\"$key\"]")
-                if [ "$secret_value" != "null" ] && [ -n "$secret_value" ]; then
-                  echo "$key=$secret_value" >> $GITHUB_ENV
-                fi
-              fi
-            done
-          fi
+          echo "$SECRETS_CONTEXT" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> "$GITHUB_ENV"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -66,12 +52,11 @@ jobs:
           fi
 
       - name: Build project
-        run: bun run build && touch ./dist/.nojekyll #⚡Adjust to your build output folder (dist or out)
-
+        run: bun run build && touch ./dist/.nojekyll #✎ Adjust to your build output folder (dist or out)
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.6.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: public
-          folder: dist #⚡Adjust to your build output folder (dist or out)
+          folder: dist #✎ Adjust to your build output folder (dist or out)
