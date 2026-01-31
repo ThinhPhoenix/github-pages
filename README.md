@@ -12,8 +12,19 @@ A well-structured template for deploying **Vite, Next.js, Nuxt.js**, and similar
 ## 🚀 Quick Start
 
 ### 1. Enable GitHub Actions Permissions
-Navigate to:
-`Repository ▸ Settings ▸ Actions ▸ General ▸ Workflow permissions ▸ Read & Write`
+
+**Option A - Using GitHub CLI (Recommended):**
+```bash
+gh api -X PUT /repos/{owner}/{repo}/actions/permissions/workflow -f default_workflow_permissions='write'
+```
+Or for current repository:
+```bash
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+gh api -X PUT /repos/$REPO/actions/permissions/workflow -f default_workflow_permissions='write'
+```
+
+**Option B - Manual Setup:**
+Navigate to: `Repository ▸ Settings ▸ Actions ▸ General ▸ Workflow permissions ▸ Read & Write`
 
 
 ### 2. Configure Base URL in vite.config.ts
