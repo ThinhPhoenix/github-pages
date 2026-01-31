@@ -1,250 +1,321 @@
 #!/usr/bin/env node
 
 import { execSync } from 'child_process';
-import { writeFileSync, existsSync, mkdirSync } from 'fs';
-import * as readline from 'readline';
+import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'fs';
+import { createInterface } from 'readline';
 
 const WORKFLOW_CONTENT_URL = 'https://cdn.jsdelivr.net/gh/ThinhPhoenix/github-pages@main/.github/workflows/deploy.yml';
 const WORKFLOW_PATH = '.github/workflows/deploy.yml';
 
-// Utility functions
-function exec(command: string, silent = false): string {
-  try {
-    const result = execSync(command, { 
-      encoding: 'utf-8',
-      stdio: silent ? 'pipe' : 'inherit'
-    });
-    return result;
-  } catch (error: any) {
-    if (!silent) {
-      console.error(`❌ Error executing command: ${command}`);
-      console.error(error.message);
-    }
-    throw error;
-  }
-}
+// ANSI colors
+const reset = '\x1b[0m';
+const bold = '\x1b[1m';
+const dim = '\x1b[2m';
+const red = '\x1b[31m';
+const green = '\x1b[32m';
+const yellow = '\x1b[33m';
+const blue = '\x1b[34m';
+const cyan = '\x1b[36m';
 
-function log(message: string, emoji = '🔷') {
-  console.log(`${emoji} ${message}`);
-}
+const gray = (t: string) => `${dim}${t}${reset}`;
+const lightRed = (t: string) => `${red}${t}${reset}`;
+const lightGreen = (t: string) => `${green}${t}${reset}`;
+const lightYellow = (t: string) => `${yellow}${t}${reset}`;
+const lightBlue = (t: string) => `${blue}${t}${reset}`;
+const lightCyan = (t: string) => `${cyan}${t}${reset}`;
 
-function success(message: string) {
-  console.log(`✅ ${message}`);
-}
+// UI helpers
+function step(msg: string) { console.log(`\n${lightCyan('◇')} ${bold}${msg}${reset}`); }
+function success(msg: string) { console.log(`${lightGreen('✓')} ${msg}`); }
+function error(msg: string) { console.error(`${lightRed('✖')} ${msg}`); }
+function warning(msg: string) { console.log(`${lightYellow('⚠')} ${msg}`); }
+function info(msg: string) { console.log(`${gray('│')} ${msg}`); }
 
-function warning(message: string) {
-  console.log(`⚠️  ${message}`);
-}
-
-async function fetchWorkflowContent(): Promise<string> {
-  log('Fetching workflow content from CDN...');
-  try {
-    const response = await fetch(WORKFLOW_CONTENT_URL);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.statusText}`);
-    }
-    return await response.text();
-  } catch (error: any) {
-    throw new Error(`Failed to download workflow content: ${error.message}`);
-  }
-}
-
-function createWorkflowFile(content: string) {
-  log('Creating workflow file...');
+// Spinner
+class Spinner {
+  private intval: NodeJS.Timeout | null = null;
+  private frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+  private i = 0;
   
-  const workflowDir = '.github/workflows';
-  if (!existsSync(workflowDir)) {
-    mkdirSync(workflowDir, { recursive: true });
+  start(text: string) {
+    process.stdout.write('\n');
+    this.intval = setInterval(() => {
+      process.stdout.write(`\r${gray(this.frames[this.i])} ${text}`);
+      this.i = (this.i + 1) % this.frames.length;
+    }, 80);
   }
   
+  stop(finalText: string, ok = true) {
+    if (this.intval) clearInterval(this.intval);
+    this.intval = null;
+    process.stdout.write('\r');
+    console.log(`${ok ? lightGreen('✓') : lightRed('✖')} ${finalText}`);
+  }
+}
+
+const spinner = new Spinner();
+const rl = createInterface({ input: process.stdin, output: process.stdout });
+
+function exec(cmd: string, silent = true): string {
+  try {
+    return execSync(cmd, { encoding: 'utf-8', stdio: silent ? 'pipe' : 'inherit' });
+  } catch (err: any) {
+    throw new Error(`Command failed: ${cmd}`);
+  }
+}
+
+async function prompt(question: string, def?: string): Promise<string> {
+  return new Promise((resolve) => {
+    const txt = def ? `${question} ${gray(`(${def})`)} ` : `${question} `;
+    rl.question(txt, (ans) => resolve(ans.trim() || def || ''));
+  });
+}
+
+async function select(question: string, options: { value: string; label: string }[]): Promise<string> {
+  console.log(`${lightCyan('?')} ${bold}${question}${reset}`);
+  options.forEach((opt, i) => {
+    console.log(`  ${lightCyan(`${i + 1}`)}) ${opt.label}`);
+  });
+  
+  while (true) {
+    const ans = await prompt('Select');
+    const num = parseInt(ans);
+    if (num >= 1 && num <= options.length) return options[num - 1].value;
+    info('Please enter a valid number');
+  }
+}
+
+function getRepo(): string {
+  return exec('gh repo view --json nameWithOwner -q .nameWithOwner', true).trim();
+}
+
+async function fetchWorkflow(): Promise<string> {
+  spinner.start('Downloading workflow template...');
+  try {
+    const res = await fetch(WORKFLOW_CONTENT_URL);
+    if (!res.ok) throw new Error();
+    const text = await res.text();
+    spinner.stop('Downloaded workflow template');
+    return text;
+  } catch {
+    spinner.stop('Failed to download workflow', false);
+    throw new Error('Could not fetch workflow template');
+  }
+}
+
+function createWorkflow(content: string) {
+  const dir = '.github/workflows';
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   writeFileSync(WORKFLOW_PATH, content, 'utf-8');
-  success(`Created ${WORKFLOW_PATH}`);
+  success(`Created ${lightBlue(WORKFLOW_PATH)}`);
 }
 
-function setWorkflowPermissions() {
-  log('Setting workflow permissions...');
+async function handleSecrets() {
+  step('Configure Secrets');
   
+  const envPath = '.env';
+  const envExists = existsSync(envPath);
+  
+  if (envExists) {
+    const content = readFileSync(envPath, 'utf-8');
+    const count = content.split('\n').filter(l => l.trim() && !l.startsWith('#')).length;
+    info(`Found ${lightBlue(count.toString())} secrets in ${lightBlue('.env')}`);
+  } else {
+    info('No .env file detected');
+  }
+  
+  const choice = await select('How would you like to proceed?', [
+    { value: 'auto', label: envExists ? 'Set secrets from .env automatically' : 'Create .env and set secrets' },
+    { value: 'skip', label: 'Skip for now (configure manually later)' }
+  ]);
+  
+  if (choice === 'skip') {
+    info('Skipped. Set manually with:');
+    info(lightYellow('  gh secret set -f .env'));
+    info(lightYellow('  gh secret set KEY_NAME'));
+    return;
+  }
+  
+  // choice === 'auto'
+  if (!envExists) {
+    info('Creating .env template...');
+    writeFileSync(envPath, '# GitHub Actions Secrets\n# Add secrets below (one per line):\n# EXAMPLE_KEY=example_value\n\n', 'utf-8');
+    success('Created .env file');
+    info('Please edit .env and add your secrets now');
+    await prompt('Press Enter when ready to continue...');
+  }
+  
+  if (!existsSync(envPath) || readFileSync(envPath, 'utf-8').trim().length === 0) {
+    warning('.env is empty, skipping secret upload');
+    return;
+  }
+  
+  spinner.start('Uploading secrets to GitHub...');
   try {
-    const repoInfo = exec(
-      'gh repo view --json nameWithOwner -q .nameWithOwner',
-      true
-    ).trim();
-    
-    exec(
-      `gh api -X PUT /repos/${repoInfo}/actions/permissions/workflow -f default_workflow_permissions='write'`,
-      true
-    );
-    
-    success('Workflow permissions set to write');
-  } catch (error) {
-    warning('Failed to set workflow permissions. You may need to do this manually.');
+    exec(`gh secret set -f ${envPath}`, true);
+    spinner.stop('Secrets configured successfully');
+  } catch {
+    spinner.stop('Failed to upload secrets', false);
+    info('Try manually: ' + lightYellow(`gh secret set -f ${envPath}`));
   }
 }
 
-function promptSecrets() {
-  console.log('\n📝 Step: Set GitHub Secrets');
-  console.log('─'.repeat(50));
-  console.log('Please ensure you have a .env file with your secrets.');
-  console.log('Run the following command to set secrets:');
-  console.log('\n  gh secret set -f .env\n');
-  
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  
-  return new Promise<void>((resolve) => {
-    rl.question('Press Enter after you have set the secrets... ', () => {
-      rl.close();
-      success('Secrets configuration confirmed');
-      resolve();
-    });
-  });
+function getGitStatus(): { changes: boolean; branch: string } {
+  try {
+    const branch = exec('git branch --show-current', true).trim();
+    const status = exec('git status --porcelain', true);
+    return { changes: status.trim().length > 0, branch };
+  } catch {
+    return { changes: false, branch: 'main' };
+  }
 }
 
-function promptCommitAndPush() {
-  console.log('\n📤 Step: Commit and Push Code');
-  console.log('─'.repeat(50));
-  console.log('Please commit and push your code to trigger the deployment.');
-  console.log('Example commands:');
-  console.log('\n  git add .');
-  console.log('  git commit -m "Setup GitHub Pages deployment"');
-  console.log('  git push\n');
+async function handleGit() {
+  step('Commit and Push');
   
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
+  const { changes, branch } = getGitStatus();
+  if (!changes) {
+    success('No changes to commit');
+    return;
+  }
   
-  return new Promise<void>((resolve) => {
-    rl.question('Press Enter after you have pushed the code... ', () => {
-      rl.close();
-      success('Code push confirmed');
-      resolve();
-    });
-  });
+  info(`Branch: ${lightBlue(branch)}`);
+  exec('git status --short', false);
+  
+  const msg = await prompt('Commit message?', 'Setup GitHub Pages deployment');
+  
+  spinner.start('Committing...');
+  try {
+    exec('git add .', true);
+    exec(`git commit -m "${msg.replace(/"/g, '\\"')}"`, true);
+    spinner.stop('Changes committed');
+    
+    spinner.start(`Pushing to ${branch}...`);
+    exec(`git push origin ${branch}`, true);
+    spinner.stop(`Pushed to ${branch}`);
+  } catch {
+    spinner.stop('Git operation failed', false);
+    process.exit(1);
+  }
 }
 
-async function waitForPublicBranch() {
-  log('Waiting for build to complete (public branch to appear)...');
+async function waitForBuild() {
+  step('Waiting for Build');
+  info('Monitoring GitHub Actions for public branch creation...');
   
-  const maxWaitTime = 600; // 10 minutes
-  const checkInterval = 10; // 10 seconds
-  let elapsed = 0;
+  const repo = getRepo();
+  const maxAttempts = 60;
   
-  while (elapsed < maxWaitTime) {
+  for (let i = 0; i < maxAttempts; i++) {
     try {
-      const branches = exec('gh api repos/$(gh repo view --json nameWithOwner -q .nameWithOwner)/branches --jq ".[].name"', true);
-      
+      const branches = exec(`gh api repos/${repo}/branches --jq '.[].name'`, true);
       if (branches.includes('public')) {
-        success('Build completed! Public branch detected.');
+        console.log();
+        success('Build completed! Public branch created');
         return true;
       }
-    } catch (error) {
-      // Continue waiting
-    }
+    } catch {}
     
-    process.stdout.write(`\r⏳ Waiting... ${elapsed}s elapsed`);
-    await new Promise(resolve => setTimeout(resolve, checkInterval * 1000));
-    elapsed += checkInterval;
+    process.stdout.write(`\r${gray('│')} Elapsed: ${i * 5}s`);
+    await new Promise(r => setTimeout(r, 5000));
   }
   
-  console.log('');
-  warning('Timeout waiting for public branch. Please check the Actions tab.');
+  console.log();
+  warning('Timeout (5 min). Check status manually:');
+  info(lightBlue(`https://github.com/${repo}/actions`));
   return false;
 }
 
-function enableGitHubPages() {
-  log('Enabling GitHub Pages...');
+async function enablePages() {
+  step('Enable GitHub Pages');
+  const repo = getRepo();
+  
+  spinner.start('Enabling Pages...');
+  try {
+    exec(`gh api repos/${repo}/pages -X POST -f source[branch]=public -f source[path]=/`, true);
+    spinner.stop('Pages enabled');
+  } catch (err: any) {
+    if (err.message.includes('409')) {
+      spinner.stop('Pages already enabled');
+    } else {
+      spinner.stop('Could not enable automatically', false);
+      info('Enable manually in repository settings');
+      return;
+    }
+  }
   
   try {
-    const repoInfo = exec(
-      'gh repo view --json nameWithOwner -q .nameWithOwner',
-      true
-    ).trim();
-    
-    exec(
-      `gh api repos/${repoInfo}/pages -X POST -f source[branch]=public -f source[path]=/`,
-      true
-    );
-    
-    success('GitHub Pages enabled successfully!');
-    
-    // Get the pages URL
-    try {
-      const pagesInfo = exec(
-        `gh api repos/${repoInfo}/pages --jq .html_url`,
-        true
-      ).trim();
-      
-      console.log('\n🎉 Deployment Complete!');
-      console.log('─'.repeat(50));
-      console.log(`Your site will be available at: ${pagesInfo}`);
-      console.log('Note: It may take a few minutes for the site to be fully deployed.\n');
-    } catch (e) {
-      // Pages URL might not be immediately available
-    }
-  } catch (error: any) {
-    if (error.message.includes('409')) {
-      success('GitHub Pages is already enabled for this repository.');
-    } else {
-      warning('Failed to enable GitHub Pages automatically. You may need to enable it manually in repository settings.');
-    }
+    const url = exec(`gh api repos/${repo}/pages --jq .html_url`, true).trim();
+    console.log(`\n  ${lightGreen('➜')}  ${bold}Site:${reset} ${lightCyan(url)}`);
+  } catch {
+    info('Site URL will be available shortly');
   }
 }
 
+// Main
 async function main() {
-  console.log('\n🚀 GitHub Pages Deployment Setup');
-  console.log('═'.repeat(50));
-  console.log('');
+  console.log(`\n  ${bold}${lightCyan('GITHUB PAGES DEPLOYMENT')}${reset}`);
+  console.log(`  ${gray('Automated GitHub Actions setup')}`);
+  
+  // Checks
+  try { exec('gh --version', true); } catch {
+    error('GitHub CLI (gh) not found');
+    info('Install: ' + lightBlue('https://cli.github.com'));
+    process.exit(1);
+  }
+  
+  try { exec('git rev-parse --git-dir', true); } catch {
+    error('Not a git repository');
+    process.exit(1);
+  }
   
   try {
-    // Check if gh CLI is installed
+    // Setup workflow
+    const workflow = await fetchWorkflow();
+    createWorkflow(workflow);
+    
+    // Permissions
+    const repo = getRepo();
+    spinner.start('Configuring workflow permissions...');
     try {
-      exec('gh --version', true);
-    } catch (error) {
-      console.error('❌ GitHub CLI (gh) is not installed or not in PATH.');
-      console.error('Please install it from: https://cli.github.com/');
-      process.exit(1);
+      exec(`gh api -X PUT repos/${repo}/actions/permissions/workflow -f default_workflow_permissions=write`, true);
+      spinner.stop('Workflow permissions set');
+    } catch (err: any) {
+      // Check if already configured
+      try {
+        const current = exec(`gh api repos/${repo}/actions/permissions/workflow --jq .default_workflow_permissions`, true).trim();
+        if (current === 'write') {
+          spinner.stop('Workflow permissions already set');
+        } else {
+          spinner.stop('Could not set permissions', false);
+          info(`Current: ${current}, please set to 'write' in repository settings`);
+        }
+      } catch {
+        spinner.stop('Could not set permissions', false);
+      }
     }
     
-    // Check if we're in a git repository
-    try {
-      exec('git rev-parse --git-dir', true);
-    } catch (error) {
-      console.error('❌ Not a git repository. Please run this command in a git repository.');
-      process.exit(1);
-    }
+    // Secrets with 2 options
+    await handleSecrets();
     
-    // Step 1 & 2: Download and create workflow file
-    const workflowContent = await fetchWorkflowContent();
-    createWorkflowFile(workflowContent);
+    // Git
+    await handleGit();
     
-    // Step 3: Set workflow permissions
-    setWorkflowPermissions();
+    // Wait for build
+    const ok = await waitForBuild();
+    if (!ok) process.exit(1);
     
-    // Step 4: Prompt for secrets
-    await promptSecrets();
+    // Enable pages
+    await enablePages();
     
-    // Step 5: Prompt to commit and push
-    await promptCommitAndPush();
+    console.log(`\n  ${lightGreen('✓')}  ${bold}Setup complete!${reset}\n`);
     
-    // Step 6: Wait for build
-    const buildSuccess = await waitForPublicBranch();
-    
-    if (!buildSuccess) {
-      console.log('\nYou can manually check the build status in the Actions tab.');
-      console.log('Once the build is complete, run the following command:');
-      console.log('\n  gh api repos/$(gh repo view --json nameWithOwner -q .nameWithOwner)/pages -X POST -f source[branch]=public -f source[path]=/\n');
-      process.exit(1);
-    }
-    
-    // Step 7 & 8: Enable GitHub Pages
-    enableGitHubPages();
-    
-  } catch (error: any) {
-    console.error('\n❌ An error occurred:', error.message);
+  } catch (err: any) {
+    console.log();
+    error(err.message);
     process.exit(1);
+  } finally {
+    rl.close();
   }
 }
 
