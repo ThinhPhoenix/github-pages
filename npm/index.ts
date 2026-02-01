@@ -25,7 +25,7 @@ const lightBlue = (t: string) => `${blue}${t}${reset}`;
 const lightCyan = (t: string) => `${cyan}${t}${reset}`;
 
 // UI helpers
-function step(msg: string) { console.log(`\n${lightCyan('◇')} ${bold}${msg}${reset}`); }
+function step(msg: string) { console.log(`${lightCyan('◇')} ${bold}${msg}${reset}`); }
 function success(msg: string) { console.log(`${lightGreen('✓')} ${msg}`); }
 function error(msg: string) { console.error(`${lightRed('✖')} ${msg}`); }
 function warning(msg: string) { console.log(`${lightYellow('⚠')} ${msg}`); }
@@ -38,7 +38,6 @@ class Spinner {
   private i = 0;
   
   start(text: string) {
-    process.stdout.write('\n');
     this.intval = setInterval(() => {
       process.stdout.write(`\r${gray(this.frames[this.i])} ${text}`);
       this.i = (this.i + 1) % this.frames.length;
@@ -48,8 +47,7 @@ class Spinner {
   stop(finalText: string, ok = true) {
     if (this.intval) clearInterval(this.intval);
     this.intval = null;
-    process.stdout.write('\r');
-    console.log(`${ok ? lightGreen('✓') : lightRed('✖')} ${finalText}`);
+    process.stdout.write(`\r${ok ? lightGreen('✓') : lightRed('✖')} ${finalText}\n`);
   }
 }
 
