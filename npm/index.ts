@@ -204,7 +204,7 @@ async function waitForBuild() {
       const branches = exec(`gh api repos/${repo}/branches --jq ".[].name"`, true).trim();
       const branchList = branches.split('\n');
       if (branchList.includes('public')) {
-        process.stdout.write('\n');
+        process.stdout.write('\r\x1b[K');
         success('Build completed! Public branch created');
         return true;
       }
@@ -214,7 +214,7 @@ async function waitForBuild() {
     await new Promise(r => setTimeout(r, 5000));
   }
   
-  process.stdout.write('\n');
+  process.stdout.write('\r\x1b[K');
   warning('Timeout (5 min). Check status manually:');
   info(lightBlue(`https://github.com/${repo}/actions`));
   return false;
