@@ -26,7 +26,7 @@ const lightCyan = (t: string) => `${cyan}${t}${reset}`;
 
 // UI helpers
 function step(msg: string) { console.log(`${lightCyan('◇')} ${bold}${msg}${reset}`); }
-function success(msg: string) { console.log(`${lightGreen('✓')} ${msg}`); }
+function success(msg: string) { console.log(`${gray('│')} ${lightGreen('✓')} ${msg}`); }
 function error(msg: string) { console.error(`${lightRed('✖')} ${msg}`); }
 function warning(msg: string) { console.log(`${lightYellow('⚠')} ${msg}`); }
 function info(msg: string) { console.log(`${gray('│')} ${msg}`); }
