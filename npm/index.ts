@@ -70,9 +70,7 @@ function info(msg: string) {
   console.log(`${c.gray(s.line)}  ${c.dim(msg)}`); 
 }
 
-function end(msg: string) {
-  console.log(`${c.gray(s.branch)}  ${msg}`);
-}
+
 
 // Spinner
 class Spinner {
@@ -170,9 +168,9 @@ async function handleSecrets() {
   ]);
   
   if (choice === 'skip') {
-    end('Skipped. Set manually with:');
-    console.log(`      ${c.dim('$')} ${c.yellow('gh secret set -f .env')}`);
-    console.log(`      ${c.dim('$')} ${c.yellow('gh secret set KEY_NAME')}`);
+    info('Skipped. Set manually with:');
+    console.log(`${c.gray(s.line)}    ${c.dim('$')} ${c.yellow('gh secret set -f .env')}`);
+    console.log(`${c.gray(s.line)}    ${c.dim('$')} ${c.yellow('gh secret set KEY_NAME')}`);
     return;
   }
   
@@ -185,7 +183,7 @@ async function handleSecrets() {
   }
   
   if (!existsSync(envPath) || readFileSync(envPath, 'utf-8').trim().length === 0) {
-    end('⚠ .env is empty, skipping secret upload');
+    info('⚠ .env is empty, skipping secret upload');
     return;
   }
   
@@ -261,7 +259,7 @@ async function waitForBuild() {
   }
   
   process.stdout.write('\r\x1b[K');
-  end('⚠ Timeout after 5 minutes');
+  info('⚠ Timeout after 5 minutes');
   info(`Check status manually: ${c.cyan(`https://github.com/${repo}/actions`)}`);
   return false;
 }
