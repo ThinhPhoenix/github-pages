@@ -3,6 +3,11 @@ body {
   font-family: 'Victor Mono', monospace; 
 }
 
+/* Hide default cursor on all interactive elements */
+a, button, [role="button"], input, textarea, select, [onclick] {
+  cursor: none !important;
+}
+
 .font-mono { 
   font-family: 'Victor Mono', monospace; 
 }

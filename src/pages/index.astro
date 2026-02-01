@@ -33,11 +33,57 @@ import SiteFooter from '../components/site-footer.astro';
     }
   </script>
 </head>
-<body class="bg-[#0a0a0a] text-white antialiased">
+<body class="bg-[#0a0a0a] text-white antialiased" style="cursor: none;">
+  <!-- Custom Cursor -->
+  <div id="cursor-main" class="fixed w-4 h-4 bg-white pointer-events-none z-[9999] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+  <div class="cursor-trail fixed w-2 h-2 bg-white/60 pointer-events-none z-[9998] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+  <div class="cursor-trail fixed w-2 h-2 bg-white/50 pointer-events-none z-[9997] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+  <div class="cursor-trail fixed w-2 h-2 bg-white/40 pointer-events-none z-[9996] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+  <div class="cursor-trail fixed w-2 h-2 bg-white/30 pointer-events-none z-[9995] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+  <div class="cursor-trail fixed w-2 h-2 bg-white/20 pointer-events-none z-[9994] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+
   <SiteNavigation />
   <HeroSection />
   <FeaturesSection />
   <FaqSection />
   <SiteFooter />
+
+  <script is:inline>
+    (function() {
+      const mainCursor = document.getElementById('cursor-main');
+      const trails = document.querySelectorAll('.cursor-trail');
+      
+      let mouseX = 0, mouseY = 0;
+      let mainX = 0, mainY = 0;
+      let trailPositions = trails.length > 0 ? Array(trails.length).fill({ x: 0, y: 0 }) : [];
+      
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      function animate() {
+        mainX = mouseX;
+        mainY = mouseY;
+        mainCursor.style.left = mainX + 'px';
+        mainCursor.style.top = mainY + 'px';
+
+        trailPositions.forEach((pos, i) => {
+          const targetX = i === 0 ? mainX : trailPositions[i - 1].x;
+          const targetY = i === 0 ? mainY : trailPositions[i - 1].y;
+          trailPositions[i] = {
+            x: pos.x + (targetX - pos.x) * 0.5,
+            y: pos.y + (targetY - pos.y) * 0.5
+          };
+          trails[i].style.left = trailPositions[i].x + 'px';
+          trails[i].style.top = trailPositions[i].y + 'px';
+        });
+
+        requestAnimationFrame(animate);
+      }
+      
+      animate();
+    })();
+  </script>
 </body>
 </html>
