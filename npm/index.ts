@@ -51,9 +51,12 @@ const symbols = {
 
 // UI helper functions
 function header(text: string) {
-  console.log(`\n  ${c.cyan(symbols.corner.tl)}${c.dim(symbols.line.repeat(40))}${c.cyan(symbols.corner.tr)}`);
-  console.log(`  ${c.cyan(symbols.corner.pipe)}  ${c.bold(text)}${' '.repeat(38 - text.length)}${c.cyan(symbols.corner.pipe)}`);
-  console.log(`  ${c.cyan(symbols.corner.bl)}${c.dim(symbols.line.repeat(40))}${c.cyan(symbols.corner.br)}`);
+  const width = 42;
+  const contentWidth = text.length;
+  const padding = width - contentWidth - 4;
+  console.log(`\n  ${c.cyan(symbols.corner.tl)}${c.dim(symbols.line.repeat(width))}${c.cyan(symbols.corner.tr)}`);
+  console.log(`  ${c.cyan(symbols.corner.pipe)}  ${c.bold(text)}${' '.repeat(padding)}  ${c.cyan(symbols.corner.pipe)}`);
+  console.log(`  ${c.cyan(symbols.corner.bl)}${c.dim(symbols.line.repeat(width))}${c.cyan(symbols.corner.br)}`);
 }
 
 function success(msg: string) { 
@@ -299,12 +302,13 @@ async function enablePages() {
 async function main() {
   console.log('');
   console.log(c.cyan(`
-      ╭──────────────────────────────────╮
-      │                                  │
-      │   GitHub Pages Deployment CLI    │
-      │                                  │
-      ╰──────────────────────────────────╯
+     _ _   _       _                           
+ ___|_| |_| |_ _ _| |_ ___ ___ ___ ___ ___ ___ 
+| . | |  _|   | | | . |___| . | .'| . | -_|_ -|
+|_  |_|_| |_|_|___|___|   |  _|__,|_  |___|___|
+|___|                     |_|     |___|        
   `));
+  console.log('');
   
   // Checks
   try { exec('gh --version', true); } catch {
@@ -357,15 +361,21 @@ async function main() {
     await enablePages();
     
     // Final success box
+    const boxWidth = 42;
+    const makeLine = (content: string) => {
+      const padding = boxWidth - content.length;
+      return `  ${c.green(symbols.corner.pipe)} ${content}${' '.repeat(padding)} ${c.green(symbols.corner.pipe)}`;
+    };
+    
     console.log('');
-    console.log(`  ${c.green(symbols.corner.tl)}${c.green(symbols.line.repeat(44))}${c.green(symbols.corner.tr)}`);
-    console.log(`  ${c.green(symbols.corner.pipe)}                                            ${c.green(symbols.corner.pipe)}`);
-    console.log(`  ${c.green(symbols.corner.pipe)}   ${c.bold('Setup Complete!')} 🎉                    ${c.green(symbols.corner.pipe)}`);
-    console.log(`  ${c.green(symbols.corner.pipe)}                                            ${c.green(symbols.corner.pipe)}`);
-    console.log(`  ${c.green(symbols.corner.pipe)}   Your site is being deployed              ${c.green(symbols.corner.pipe)}`);
-    console.log(`  ${c.green(symbols.corner.pipe)}   and will be live shortly                 ${c.green(symbols.corner.pipe)}`);
-    console.log(`  ${c.green(symbols.corner.pipe)}                                            ${c.green(symbols.corner.pipe)}`);
-    console.log(`  ${c.green(symbols.corner.bl)}${c.green(symbols.line.repeat(44))}${c.green(symbols.corner.br)}`);
+    console.log(`  ${c.green(symbols.corner.tl)}${c.green(symbols.line.repeat(boxWidth + 2))}${c.green(symbols.corner.tr)}`);
+    console.log(makeLine(''));
+    console.log(makeLine(`${c.bold('Setup Complete!')} 🎉`));
+    console.log(makeLine(''));
+    console.log(makeLine('Your site is being deployed'));
+    console.log(makeLine('and will be live shortly'));
+    console.log(makeLine(''));
+    console.log(`  ${c.green(symbols.corner.bl)}${c.green(symbols.line.repeat(boxWidth + 2))}${c.green(symbols.corner.br)}`);
     console.log('');
     
   } catch (err: any) {
