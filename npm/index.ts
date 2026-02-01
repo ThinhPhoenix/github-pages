@@ -204,7 +204,7 @@ async function waitForBuild() {
       const branches = exec(`gh api repos/${repo}/branches --jq ".[].name"`, true).trim();
       const branchList = branches.split('\n');
       if (branchList.includes('public')) {
-        console.log();
+        process.stdout.write('\n');
         success('Build completed! Public branch created');
         return true;
       }
@@ -214,7 +214,7 @@ async function waitForBuild() {
     await new Promise(r => setTimeout(r, 5000));
   }
   
-  console.log();
+  process.stdout.write('\n');
   warning('Timeout (5 min). Check status manually:');
   info(lightBlue(`https://github.com/${repo}/actions`));
   return false;
@@ -240,7 +240,7 @@ async function enablePages() {
   
   try {
     const url = exec(`gh api repos/${repo}/pages --jq .html_url`, true).trim();
-    console.log(`\n  ${lightGreen('➜')}  ${bold}Site:${reset} ${lightCyan(url)}`);
+    console.log(`  ${lightGreen('➜')}  ${bold}Site:${reset} ${lightCyan(url)}`);
   } catch {
     info('Site URL will be available shortly');
   }
@@ -302,7 +302,7 @@ async function main() {
     // Enable pages
     await enablePages();
     
-    console.log(`\n${lightGreen('✓')}  ${bold}Setup complete!${reset}\n`);
+    console.log(`\n${lightGreen('✓')}  ${bold}Setup complete!${reset}`);
     
   } catch (err: any) {
     console.log();
