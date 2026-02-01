@@ -7,7 +7,7 @@ Automated GitHub Pages deployment setup tool - quickly configure GitHub Actions 
 No installation needed! Run directly with `bunx`:
 
 ```bash
-bunx github-pages
+bunx @thinhphoenix/github-pages
 ```
 
 ## What it does
@@ -31,7 +31,7 @@ This CLI tool automates the entire GitHub Pages deployment setup:
 Navigate to your project directory and run:
 
 ```bash
-bunx github-pages
+bunx @thinhphoenix/github-pages
 ```
 
 Follow the interactive prompts to complete the setup.
