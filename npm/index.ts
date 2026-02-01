@@ -162,7 +162,7 @@ async function handleSecrets() {
     info('No .env file detected');
   }
   
-  const choice = await select('How would you like to proceed?', [
+  const choice = await select('  How would you like to proceed?', [
     { value: 'auto', label: envExists ? 'Set secrets from .env automatically' : 'Create .env and set secrets' },
     { value: 'skip', label: 'Skip for now (configure manually later)' }
   ]);
@@ -218,7 +218,7 @@ async function handleGit() {
   
   item('Branch:', c.cyan(branch));
   
-  const msg = await prompt('Commit message?', 'Setup GitHub Pages deployment');
+  const msg = await prompt('  Commit message?', 'Setup GitHub Pages deployment');
   
   spinner.start('Creating commit...');
   try {
