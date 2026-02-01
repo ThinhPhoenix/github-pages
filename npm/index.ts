@@ -15,6 +15,7 @@ const red = '\x1b[31m';
 const green = '\x1b[32m';
 const yellow = '\x1b[33m';
 const blue = '\x1b[34m';
+const magenta = '\x1b[35m';
 const cyan = '\x1b[36m';
 
 const gray = (t: string) => `${dim}${t}${reset}`;
@@ -23,13 +24,15 @@ const lightGreen = (t: string) => `${green}${t}${reset}`;
 const lightYellow = (t: string) => `${yellow}${t}${reset}`;
 const lightBlue = (t: string) => `${blue}${t}${reset}`;
 const lightCyan = (t: string) => `${cyan}${t}${reset}`;
+const cyanFn = (t: string) => `${cyan}${t}${reset}`;
+const magentaFn = (t: string) => `${magenta}${t}${reset}`;
 
 // UI helpers
-function step(msg: string) { console.log(`${lightCyan('◇')} ${bold}${msg}${reset}`); }
-function success(msg: string) { console.log(`${gray('│')} ${lightGreen('✓')} ${msg}`); }
-function error(msg: string) { console.error(`${lightRed('✖')} ${msg}`); }
-function warning(msg: string) { console.log(`${lightYellow('⚠')} ${msg}`); }
-function info(msg: string) { console.log(`${gray('│')} ${msg}`); }
+function step(msg: string) { console.log(`\n${lightCyan('▸')} ${bold}${msg}${reset}`); }
+function success(msg: string) { console.log(`  ${lightGreen('✓')} ${msg}`); }
+function error(msg: string) { console.error(`\n${lightRed('✖')} ${bold}${msg}${reset}`); }
+function warning(msg: string) { console.log(`  ${lightYellow('⚠')} ${msg}`); }
+function info(msg: string) { console.log(`  ${gray('│')} ${msg}`); }
 
 // Spinner
 class Spinner {
@@ -39,7 +42,7 @@ class Spinner {
   
   start(text: string) {
     this.intval = setInterval(() => {
-      process.stdout.write(`\r${gray(this.frames[this.i])} ${text}`);
+      process.stdout.write(`\r  ${gray(this.frames[this.i])} ${text}`);
       this.i = (this.i + 1) % this.frames.length;
     }, 80);
   }
@@ -47,7 +50,7 @@ class Spinner {
   stop(finalText: string, ok = true) {
     if (this.intval) clearInterval(this.intval);
     this.intval = null;
-    process.stdout.write(`\r${ok ? lightGreen('✓') : lightRed('✖')} ${finalText}\n`);
+    process.stdout.write(`\r  ${ok ? lightGreen('✓') : lightRed('✖')} ${finalText}\n`);
   }
 }
 
@@ -210,7 +213,7 @@ async function waitForBuild() {
       }
     } catch {}
     
-    process.stdout.write(`\r${gray('│')} Elapsed: ${i * 5}s`);
+    process.stdout.write(`\r  ${gray('│')} Elapsed: ${i * 5}s`);
     await new Promise(r => setTimeout(r, 5000));
   }
   
@@ -240,7 +243,7 @@ async function enablePages() {
   
   try {
     const url = exec(`gh api repos/${repo}/pages --jq .html_url`, true).trim();
-    console.log(`  ${lightGreen('➜')}  ${bold}Site:${reset} ${lightCyan(url)}`);
+    console.log(`\n  ${lightGreen('➜')}  ${bold}Site URL:${reset} ${lightCyan(url)}`);
   } catch {
     info('Site URL will be available shortly');
   }
@@ -248,8 +251,15 @@ async function enablePages() {
 
 // Main
 async function main() {
-  console.log(`\n  ${bold}${lightCyan('GITHUB PAGES DEPLOYMENT')}${reset}`);
-  console.log(`  ${gray('Automated GitHub Actions setup')}`);
+  console.log('');
+  console.log(cyanFn(`
+     _ _   _       _                           
+ ___|_| |_| |_ _ _| |_ ___ ___ ___ ___ ___ ___ 
+| . | |  _|   | | | . |___| . | .'| . | -_|_ -|
+|_  |_|_| |_|_|___|___|   |  _|__,|_  |___|___|
+|___|                     |_|     |___|        
+`));
+  console.log('');
   
   // Checks
   try { exec('gh --version', true); } catch {
@@ -302,7 +312,11 @@ async function main() {
     // Enable pages
     await enablePages();
     
-    console.log(`${lightGreen('✓')}  ${bold}Setup complete!${reset}`);
+    console.log('');
+    console.log(`  ${cyanFn('─'.repeat(42))}`);
+    console.log(`  ${lightGreen('✓')}  ${bold}Setup complete!${reset}`);
+    console.log(`  ${cyanFn('─'.repeat(42))}`);
+    console.log('');
     
   } catch (err: any) {
     console.log();
