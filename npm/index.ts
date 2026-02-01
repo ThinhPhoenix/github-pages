@@ -2,7 +2,7 @@
 
 import { execSync } from 'child_process';
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'fs';
-import { createInterface } from 'readline';
+import { select as inquirerSelect, input as inquirerInput } from '@inquirer/prompts';
 
 const WORKFLOW_CONTENT_URL = 'https://cdn.jsdelivr.net/gh/ThinhPhoenix/github-pages@main/.github/workflows/deploy.yml';
 const WORKFLOW_PATH = '.github/workflows/deploy.yml';
@@ -54,7 +54,6 @@ class Spinner {
 }
 
 const spinner = new Spinner();
-const rl = createInterface({ input: process.stdin, output: process.stdout });
 
 function exec(cmd: string, silent = true): string {
   try {
@@ -65,24 +64,20 @@ function exec(cmd: string, silent = true): string {
 }
 
 async function prompt(question: string, def?: string): Promise<string> {
-  return new Promise((resolve) => {
-    const txt = def ? `${question} ${gray(`(${def})`)} ` : `${question} `;
-    rl.question(txt, (ans) => resolve(ans.trim() || def || ''));
+  return inquirerInput({
+    message: question,
+    default: def
   });
 }
 
 async function select(question: string, options: { value: string; label: string }[]): Promise<string> {
-  console.log(`${lightCyan('?')} ${bold}${question}${reset}`);
-  options.forEach((opt, i) => {
-    console.log(`  ${lightCyan(`${i + 1}`)}) ${opt.label}`);
+  return inquirerSelect({
+    message: question,
+    choices: options.map(opt => ({
+      value: opt.value,
+      name: opt.label
+    }))
   });
-  
-  while (true) {
-    const ans = await prompt('Select');
-    const num = parseInt(ans);
-    if (num >= 1 && num <= options.length) return options[num - 1].value;
-    info('Please enter a valid number');
-  }
 }
 
 function getRepo(): string {
@@ -315,8 +310,6 @@ async function main() {
     console.log();
     error(err.message);
     process.exit(1);
-  } finally {
-    rl.close();
   }
 }
 
