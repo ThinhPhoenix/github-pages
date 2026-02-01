@@ -16,7 +16,10 @@ import SiteFooter from '../components/site-footer.astro';
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tiny5&family=Victor+Mono:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/styles/global.css">
+  <style is:global>
+    *, *::before, *::after { cursor: none !important; }
+    html, body, a, button, [role="button"], input, textarea, select, [onclick], .cursor-pointer, label, summary, [tabindex] { cursor: none !important; }
+  </style>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script is:inline src="https://cdn.tailwindcss.com"></script>
   <script is:inline>
