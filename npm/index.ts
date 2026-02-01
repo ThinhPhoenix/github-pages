@@ -302,7 +302,7 @@ async function main() {
     // Enable pages
     await enablePages();
     
-    console.log(`\n${lightGreen('✓')}  ${bold}Setup complete!${reset}`);
+    console.log(`${lightGreen('✓')}  ${bold}Setup complete!${reset}`);
     
   } catch (err: any) {
     console.log();
