@@ -217,7 +217,6 @@ async function handleGit() {
   }
   
   item('Branch:', c.cyan(branch));
-  exec('git status --short', false);
   
   const msg = await prompt('Commit message?', 'Setup GitHub Pages deployment');
   
