@@ -57,7 +57,7 @@ function exec(cmd: string, silent = true): string {
   try {
     return execSync(cmd, { encoding: 'utf-8', stdio: silent ? 'pipe' : 'inherit' });
   } catch (err: any) {
-    throw new Error(`Command failed: ${cmd}`);
+    throw new Error(`Command failed: ${cmd}\n${err.stderr || err.message}`);
   }
 }
 
