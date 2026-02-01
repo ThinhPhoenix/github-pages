@@ -284,7 +284,7 @@ async function enablePages() {
   
   try {
     const url = exec(`gh api repos/${repo}/pages --jq .html_url`, true).trim();
-    console.log(`${c.gray(s.line)}  ${c.green(s.arrow)}  Live URL: ${c.cyan(c.bold(url))}`);
+    console.log(`${c.gray(s.line)}  ${c.green(s.arrow)}  Live URL: ${c.cyan(c.bold(url))}\n└`);
   } catch {
     info('Site URL will be available shortly');
   }
