@@ -300,7 +300,6 @@ async function enablePages() {
 
 // Main
 async function main() {
-  console.log('');
   console.log(c.cyan(`
      _ _   _       _                           
  ___|_| |_| |_ _ _| |_ ___ ___ ___ ___ ___ ___ 
@@ -308,7 +307,6 @@ async function main() {
 |_  |_|_| |_|_|___|___|   |  _|__,|_  |___|___|
 |___|                     |_|     |___|        
   `));
-  console.log('');
   
   // Checks
   try { exec('gh --version', true); } catch {
@@ -362,20 +360,23 @@ async function main() {
     
     // Final success box
     const boxWidth = 42;
+    const innerWidth = 44;
+    const stripAnsi = (str: string) => str.replace(/\x1b\[[0-9;]*m/g, '');
     const makeLine = (content: string) => {
-      const padding = boxWidth - content.length;
-      return `  ${c.green(symbols.corner.pipe)} ${content}${' '.repeat(padding)} ${c.green(symbols.corner.pipe)}`;
+      const visibleLen = stripAnsi(content).length;
+      const padding = innerWidth - visibleLen;
+      return `  ${c.green(symbols.corner.pipe)} ${content}${' '.repeat(Math.max(0, padding))} ${c.green(symbols.corner.pipe)}`;
     };
     
     console.log('');
-    console.log(`  ${c.green(symbols.corner.tl)}${c.green(symbols.line.repeat(boxWidth + 2))}${c.green(symbols.corner.tr)}`);
+    console.log(`  ${c.green(symbols.corner.tl)}${c.green(symbols.line.repeat(innerWidth + 2))}${c.green(symbols.corner.tr)}`);
     console.log(makeLine(''));
     console.log(makeLine(`${c.bold('Setup Complete!')} 🎉`));
     console.log(makeLine(''));
     console.log(makeLine('Your site is being deployed'));
     console.log(makeLine('and will be live shortly'));
     console.log(makeLine(''));
-    console.log(`  ${c.green(symbols.corner.bl)}${c.green(symbols.line.repeat(boxWidth + 2))}${c.green(symbols.corner.br)}`);
+    console.log(`  ${c.green(symbols.corner.bl)}${c.green(symbols.line.repeat(innerWidth + 2))}${c.green(symbols.corner.br)}`);
     console.log('');
     
   } catch (err: any) {
