@@ -6,11 +6,12 @@ import GithubStarButton from './github-star-button.astro';
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
     <div class="flex items-center justify-between h-14">
       <div class="flex items-center gap-2">
-        <button onclick="window.location.reload()" class="font-display text-xl hover:text-gray-300 transition-colors cursor-pointer bg-transparent border-none">github-pages</button>
+        <button onclick="window.location.replace('/github-pages/')" class="font-display text-xl hover:text-gray-300 transition-colors cursor-pointer bg-transparent border-none">github-pages</button>
       </div>
       <div class="flex items-center gap-6">
-        <a href="#features" class="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors">Features</a>
-        <a href="#faq" class="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors">FAQ</a>
+        <a href="/github-pages/docs" class="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors">Docs</a>
+        <a href="/#features" class="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors">Features</a>
+        <a href="/#faq" class="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors">FAQ</a>
         <GithubStarButton />
       </div>
     </div>

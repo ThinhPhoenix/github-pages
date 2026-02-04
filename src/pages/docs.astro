@@ -1,0 +1,393 @@
+---
+import SiteNavigation from '../components/site-navigation.astro';
+import SiteFooter from '../components/site-footer.astro';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation - Deploy to GitHub Pages</title>
+  <link rel="shortcut icon" href="favicon.svg" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tiny5&family=Victor+Mono:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <style is:global>
+    *, *::before, *::after { cursor: none !important; }
+    html, body, a, button, [role="button"], input, textarea, select, [onclick], .cursor-pointer, label, summary, [tabindex] { cursor: none !important; }
+    .hljs { background: transparent !important; }
+  </style>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script is:inline src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+  <script is:inline>
+    tailwind.config = {
+      theme: {
+        extend: {
+            fontFamily: {
+              sans: ['Victor Mono', 'monospace'],
+              mono: ['Victor Mono', 'monospace'],
+              display: ['Tiny5', 'monospace'],
+            }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#0a0a0a] text-white antialiased" style="cursor: none;">
+  <div id="cursor-main" class="fixed w-4 h-4 bg-white pointer-events-none z-[9999] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+  <div class="cursor-trail fixed w-2 h-2 bg-white/60 pointer-events-none z-[9998] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+  <div class="cursor-trail fixed w-2 h-2 bg-white/50 pointer-events-none z-[9997] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+  <div class="cursor-trail fixed w-2 h-2 bg-white/40 pointer-events-none z-[9996] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+  <div class="cursor-trail fixed w-2 h-2 bg-white/30 pointer-events-none z-[9995] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+  <div class="cursor-trail fixed w-2 h-2 bg-white/20 pointer-events-none z-[9994] mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+
+  <SiteNavigation />
+
+  <section class="pt-28 pb-16 px-4 sm:px-6">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="font-black uppercase text-xl sm:text-2xl lg:text-3xl mb-4 tracking-tight leading-tight">
+        Documentation
+      </h1>
+      <p class="text-lg text-gray-400 mb-12">
+        Learn how to deploy to GitHub Pages with proper base path configuration for your framework.
+      </p>
+
+      <!-- Base Path Problem -->
+      <h2 class="font-semibold mb-6 text-left">The Base Path Problem</h2>
+      <p class="text-gray-300 mb-6 leading-relaxed">
+        When deploying to <code class="bg-[#161616] border border-white/10 px-2 py-1 rounded text-sm">username.github.io/repo-name</code>, your app is served from a subdirectory. Without configuring the base path, assets will fail to load.
+      </p>
+
+      <div class="space-y-2 mb-12">
+        <p class="text-sm text-gray-400">[-] <strong class="text-white">Without base path:</strong> assets load from <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">/assets/</code> <span class="text-red-400">(404 errors)</span></p>
+        <p class="text-sm text-gray-400">[+] <strong class="text-white">With base path:</strong> assets load from <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">/repo-name/assets/</code> <span class="text-green-400">(works)</span></p>
+      </div>
+
+      <!-- Framework Configurations -->
+      <h2 class="font-semibold mb-6 text-left">Framework Configuration</h2>
+      <p class="text-gray-400 mb-6 text-sm">Set the base path in your framework configuration file:</p>
+
+      <div class="space-y-2">
+        <!-- Vite -->
+        <div class="faq-item border-b border-white/10">
+          <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+            <span class="font-medium">Vite</span>
+            <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+          </button>
+          <div class="faq-content hidden pb-4">
+            <p class="text-gray-400 text-sm mb-3">Edit <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">vite.config.js</code>:</p>
+            <div class="bg-[#161616] border border-white/10 overflow-hidden">
+              <div class="flex items-center justify-end px-4 py-2 border-b border-white/10">
+                <button onclick="copyCode(this, 'vite-code')" class="text-gray-500 hover:text-white transition-colors">
+                  <i class="ph ph-copy"></i>
+                </button>
+              </div>
+              <div class="p-4 overflow-x-auto">
+                <pre><code class="language-javascript text-sm" id="vite-code">import &#123; defineConfig &#125; from 'vite'
+
+export default defineConfig(&#123;
+  base: '/repo-name/',
+&#125;)</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rsbuild -->
+        <div class="faq-item border-b border-white/10">
+          <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+            <span class="font-medium">Rsbuild</span>
+            <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+          </button>
+          <div class="faq-content hidden pb-4">
+            <p class="text-gray-400 text-sm mb-3">Edit <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">rsbuild.config.js</code>:</p>
+            <div class="bg-[#161616] border border-white/10 overflow-hidden">
+              <div class="flex items-center justify-end px-4 py-2 border-b border-white/10">
+                <button onclick="copyCode(this, 'rsbuild-code')" class="text-gray-500 hover:text-white transition-colors">
+                  <i class="ph ph-copy"></i>
+                </button>
+              </div>
+              <div class="p-4 overflow-x-auto">
+                <pre><code class="language-javascript text-sm" id="rsbuild-code">import &#123; defineConfig &#125; from '@rsbuild/core'
+
+export default defineConfig(&#123;
+  server: &#123;
+    base: '/repo-name/'
+  &#125;,
+&#125;)</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Astro -->
+        <div class="faq-item border-b border-white/10">
+          <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+            <span class="font-medium">Astro</span>
+            <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+          </button>
+          <div class="faq-content hidden pb-4">
+            <p class="text-gray-400 text-sm mb-3">Edit <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">astro.config.mjs</code>:</p>
+            <div class="bg-[#161616] border border-white/10 overflow-hidden">
+              <div class="flex items-center justify-end px-4 py-2 border-b border-white/10">
+                <button onclick="copyCode(this, 'astro-code')" class="text-gray-500 hover:text-white transition-colors">
+                  <i class="ph ph-copy"></i>
+                </button>
+              </div>
+              <div class="p-4 overflow-x-auto">
+                <pre><code class="language-javascript text-sm" id="astro-code">import &#123; defineConfig &#125; from 'astro/config'
+
+export default defineConfig(&#123;
+  base: '/repo-name/',
+&#125;)</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next.js -->
+        <div class="faq-item border-b border-white/10">
+          <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+            <span class="font-medium">Next.js</span>
+            <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+          </button>
+          <div class="faq-content hidden pb-4">
+            <p class="text-gray-400 text-sm mb-3">Edit <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">next.config.js</code>:</p>
+            <div class="bg-[#161616] border border-white/10 overflow-hidden">
+              <div class="flex items-center justify-end px-4 py-2 border-b border-white/10">
+                <button onclick="copyCode(this, 'nextjs-code')" class="text-gray-500 hover:text-white transition-colors">
+                  <i class="ph ph-copy"></i>
+                </button>
+              </div>
+              <div class="p-4 overflow-x-auto">
+                <pre><code class="language-javascript text-sm" id="nextjs-code">/** @type &#123;import('next').NextConfig&#125; */
+const nextConfig = &#123;
+  basePath: '/repo-name',
+  assetPrefix: '/repo-name',
+  output: 'export',
+&#125;
+
+module.exports = nextConfig</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nuxt -->
+        <div class="faq-item border-b border-white/10">
+          <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+            <span class="font-medium">Nuxt</span>
+            <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+          </button>
+          <div class="faq-content hidden pb-4">
+            <p class="text-gray-400 text-sm mb-3">Edit <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">nuxt.config.ts</code>:</p>
+            <div class="bg-[#161616] border border-white/10 overflow-hidden">
+              <div class="flex items-center justify-end px-4 py-2 border-b border-white/10">
+                <button onclick="copyCode(this, 'nuxt-code')" class="text-gray-500 hover:text-white transition-colors">
+                  <i class="ph ph-copy"></i>
+                </button>
+              </div>
+              <div class="p-4 overflow-x-auto">
+                <pre><code class="language-javascript text-sm" id="nuxt-code">export default defineNuxtConfig(&#123;
+  app: &#123;
+    baseURL: '/repo-name/'
+  &#125;,
+  nitro: &#123;
+    prerender: &#123;
+      routes: ['/']
+    &#125;
+  &#125;,
+&#125;)</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vue CLI -->
+        <div class="faq-item border-b border-white/10">
+          <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+            <span class="font-medium">Vue CLI</span>
+            <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+          </button>
+          <div class="faq-content hidden pb-4">
+            <p class="text-gray-400 text-sm mb-3">Edit <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">vue.config.js</code>:</p>
+            <div class="bg-[#161616] border border-white/10 overflow-hidden">
+              <div class="flex items-center justify-end px-4 py-2 border-b border-white/10">
+                <button onclick="copyCode(this, 'vue-code')" class="text-gray-500 hover:text-white transition-colors">
+                  <i class="ph ph-copy"></i>
+                </button>
+              </div>
+              <div class="p-4 overflow-x-auto">
+                <pre><code class="language-javascript text-sm" id="vue-code">const &#123; defineConfig &#125; = require('@vue/cli-service')
+
+module.exports = defineConfig(&#123;
+  publicPath: process.env.NODE_ENV === 'production' 
+    ? '/repo-name/' 
+    : '/',
+&#125;)</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Angular -->
+        <div class="faq-item border-b border-white/10">
+          <button onclick="toggleFaq(this)" class="faq-trigger w-full py-4 flex items-center justify-between text-left hover:text-white transition-colors">
+            <span class="font-medium">Angular</span>
+            <i class="ph ph-caret-down faq-icon text-gray-500 transition-transform duration-200"></i>
+          </button>
+          <div class="faq-content hidden pb-4">
+            <p class="text-gray-400 text-sm mb-3">Edit <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">angular.json</code>:</p>
+            <div class="bg-[#161616] border border-white/10 overflow-hidden">
+              <div class="flex items-center justify-end px-4 py-2 border-b border-white/10">
+                <button onclick="copyCode(this, 'angular-code')" class="text-gray-500 hover:text-white transition-colors">
+                  <i class="ph ph-copy"></i>
+                </button>
+              </div>
+              <div class="p-4 overflow-x-auto">
+                <pre><code class="language-json text-sm" id="angular-code">&#123;
+  "projects": &#123;
+    "your-project-name": &#123;
+      "architect": &#123;
+        "build": &#123;
+          "options": &#123;
+            "baseHref": "/repo-name/",
+            "deployUrl": "/repo-name/"
+          &#125;
+        &#125;
+      &#125;
+    &#125;
+  &#125;
+&#125;</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist -->
+      <h2 class="font-semibold mb-6 text-left mt-12">Quick Checklist</h2>
+      <div class="space-y-2 text-sm">
+        <p>[*] <strong class="text-white">Repository is public</strong> - Required for free GitHub Pages</p>
+        <p>[*] <strong class="text-white">Base path configured</strong> - Set to <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">/repo-name/</code> in your config</p>
+        <p>[*] <strong class="text-white">Static export enabled</strong> - Required for frameworks like Next.js</p>
+        <p>[*] <strong class="text-white">GitHub Actions workflow</strong> - File in <code class="bg-[#161616] border border-white/10 px-1.5 py-0.5 rounded">.github/workflows/</code></p>
+      </div>
+
+      <!-- Back Link -->
+      <div class="mt-12 pt-8 border-t border-white/10">
+        <a href="/" class="text-sm text-gray-400 hover:text-white transition-colors inline-flex items-center gap-1">
+          <i class="ph ph-arrow-left"></i>
+          Back to Home
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toast Container -->
+  <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#161616] border border-white/10 text-white px-5 py-3 shadow-2xl flex items-center gap-3 opacity-0 translate-y-4 transition-all duration-300 pointer-events-none z-50">
+    <i class="ph ph-check-circle text-emerald-400 text-lg"></i>
+    <span class="text-sm font-medium">Copied to clipboard!</span>
+  </div>
+
+  <SiteFooter />
+
+  <script is:inline>
+    function toggleFaq(button) {
+      var content = button.nextElementSibling;
+      var icon = button.querySelector('.faq-icon');
+      
+      if (content && icon) {
+        if (content.classList.contains('hidden')) {
+          content.classList.remove('hidden');
+          icon.style.transform = 'rotate(180deg)';
+          // Highlight code when accordion opens
+          if (typeof hljs !== 'undefined') {
+            content.querySelectorAll('pre code').forEach((block) => {
+              hljs.highlightElement(block);
+            });
+          }
+        } else {
+          content.classList.add('hidden');
+          icon.style.transform = 'rotate(0deg)';
+        }
+      }
+    }
+
+    function copyCode(btn, elementId) {
+      var el = document.getElementById(elementId);
+      if (el && el.textContent) {
+        navigator.clipboard.writeText(el.textContent).then(function() {
+          showToast();
+          
+          var icon = btn.querySelector('i');
+          if (icon) {
+            icon.classList.remove('ph-copy');
+            icon.classList.add('ph-check');
+            setTimeout(function() {
+              icon.classList.remove('ph-check');
+              icon.classList.add('ph-copy');
+            }, 2000);
+          }
+        });
+      }
+    }
+
+    function showToast() {
+      var toast = document.getElementById('toast');
+      if (toast) {
+        toast.classList.remove('opacity-0', 'translate-y-4');
+        setTimeout(function() {
+          toast.classList.add('opacity-0', 'translate-y-4');
+        }, 2000);
+      }
+    }
+
+    // Initialize highlight.js on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof hljs !== 'undefined') {
+        hljs.highlightAll();
+      }
+    });
+
+    (function() {
+      const mainCursor = document.getElementById('cursor-main');
+      const trails = document.querySelectorAll('.cursor-trail');
+      
+      let mouseX = 0, mouseY = 0;
+      let mainX = 0, mainY = 0;
+      let trailPositions = trails.length > 0 ? Array(trails.length).fill({ x: 0, y: 0 }) : [];
+      
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      function animate() {
+        mainX = mouseX;
+        mainY = mouseY;
+        mainCursor.style.left = mainX + 'px';
+        mainCursor.style.top = mainY + 'px';
+
+        trailPositions.forEach((pos, i) => {
+          const targetX = i === 0 ? mainX : trailPositions[i - 1].x;
+          const targetY = i === 0 ? mainY : trailPositions[i - 1].y;
+          trailPositions[i] = {
+            x: pos.x + (targetX - pos.x) * 0.5,
+            y: pos.y + (targetY - pos.y) * 0.5
+          };
+          trails[i].style.left = trailPositions[i].x + 'px';
+          trails[i].style.top = trailPositions[i].y + 'px';
+        });
+
+        requestAnimationFrame(animate);
+      }
+      
+      animate();
+    })();
+  </script>
+</body>
+</html>
