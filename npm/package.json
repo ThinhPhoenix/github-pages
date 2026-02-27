@@ -1,21 +1,23 @@
 {
-  "name": "@thinhphoenix/github-pages",
-  "version": "1.0.5",
-  "description": "Automated GitHub Pages deployment setup tool",
+  "name": "@thinhphoenix/gh-pages",
+  "version": "0.0.0",
+  "description": "Deploy static pages to GitHub Pages",
+  "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "github-pages": "dist/index.js"
+    "gh-pages": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsx index.ts",
+    "dev": "tsx src/index.ts",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
     "github-pages",
     "deployment",
     "automation",
-    "cli"
+    "cli",
+    "cicd"
   ],
   "author": "thinhphoenix",
   "license": "MIT",
@@ -32,6 +34,7 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "package.json"
   ]
 }

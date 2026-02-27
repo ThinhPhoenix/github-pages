@@ -1,3 +1,4 @@
+src/
 *.ts
 !*.d.ts
 tsconfig.json
@@ -6,4 +7,4 @@ tsconfig.json
 node_modules/
 *.log
 .DS_Store
-src/
+bun.lock
